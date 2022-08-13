@@ -304,14 +304,14 @@ def npcs_wiki():
     count = 0
 
     with open(f"{out}.txt", "a") as f:
-        f.write(f"==Non-Player Characters==\n{table_creation}!colspan='4'|Non-Player Characters{table_creation_2_new_npcs}")
+        f.write(f"==Non-Player Characters==\n===New NPCs===\n{table_creation}!colspan='4'|New NPCs{table_creation_2_new_npcs}")
         print("Writing New Npc")
         missing = [name for name in names2 if name not in names1]
         deleted = [name for name in names1 if name not in names2]
         for m in missing:
             with open(dir2 + str(m)) as names:
                 missing_files = json.load(names)
-                f.write(f'| [[{str(missing_files[keys[1]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || {str(missing_files[keys[13]]) if str(missing_files[keys[13]]) != "0" else "No Combat Level"} || {(str(missing_files[keys[11]])).replace("[", "").replace("]", "").replace("None,", "").replace(", None", "").replace(single_q,"")}\n')
+                f.write(f'| [[{str(missing_files[keys[1]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || {str(missing_files[keys[13]]) if str(missing_files[keys[13]]) != "0" else "No Combat Level"} || {(str(missing_files[keys[11]])).replace("[", "").replace("]", "").replace("None,", "").replace(", None", "").replace(",None","").replace(single_q,"")}\n')
 
                 f.write("|-" + "\n")
         f.write("|-\n|}" + "\n")
@@ -392,7 +392,7 @@ def objects_wiki():
         for m in missing:
             with open(dir2 + str(m)) as names:
                 missing_files = json.load(names)
-                f.write(f'| [[{str(missing_files[keys[3]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || {(str(missing_files[keys[15]])).replace("[", "").replace("]", "").replace("None,", "").replace(single_q, "")}]]\n')
+                f.write(f'| [[{str(missing_files[keys[3]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || {(str(missing_files[keys[15]])).replace("[", "").replace("]", "").replace("None,", "").replace(",None]]","").replace("]]","").replace(single_q, "")}]]\n')
                 f.write("|-" + "\n")
         f.write("|-\n|}" + "\n")
 
@@ -445,6 +445,6 @@ def objects_wiki():
         f.write("|}" + "\n\n")
 
 
-# items_wiki()
+items_wiki()
 npcs_wiki()
-# objects_wiki()
+objects_wiki()
