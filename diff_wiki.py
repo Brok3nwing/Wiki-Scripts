@@ -19,7 +19,7 @@ table_creation = '{| class="wikitable sortable"\n'
 
 table_creation_2_diff_items = '\n|-\n! Name !! ID !! Key !! Previous Value !! New Value\n|-\n'
 table_creation_2_diff_npcs = '\n|-\n! Name !! ID !! Key !! Previous Value !! New Value\n|-\n'
-table_creation_2_diff_objects = '\n|-\n! Name !! ID !! Members !! Tradeable in GE !! Equipable !! Stackable !! Noteable !! Options !! Placeholder !! Cost\n|-\n'
+table_creation_2_diff_objects = '\n|-\n! Name !! ID !! Key !! Previous Value !! New Value\n|-\n'
 
 
 table_creation_2_new_items = '\n|-\n! Name !! ID !! Members !! Tradeable in GE !! Equipable !! Stackable !! Noteable !! Options !! Placeholder !! Cost\n|-\n'
@@ -30,6 +30,7 @@ table_creation_2_removed_items = '\n|-\n! Name !! ID\n|-\n'
 table_creation_2_removed_npcs = '\n|-\n! Name !! ID\n|-\n'
 table_creation_2_removed_objects = '\n|-\n! Name !! ID\n|-\n'
 
+single_q = "'"
 
 format_options_regex1 = "[\[\]']|None"
 format_options_regex2 = "[\[\]']|None"
@@ -208,7 +209,6 @@ def items_wiki():
             f.write(f"{toc}\n==Items==\n===New Items===\n{table_creation}!colspan='11'|New Items{table_creation_2_new_items}")
             missing = [name for name in names2 if name not in names1]
             deleted = [name for name in names1 if name not in names2]
-            single_q = "'"
             print("Writing New Items")
             for m in missing:
                 with open(dir2 + str(m)) as names:
@@ -311,7 +311,8 @@ def npcs_wiki():
         for m in missing:
             with open(dir2 + str(m)) as names:
                 missing_files = json.load(names)
-                f.write(f'| [[{str(missing_files[keys[1]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || {str(missing_files[keys[13]])} || {str(missing_files[keys[11]])}\n')
+                f.write(f'| [[{str(missing_files[keys[1]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || {str(missing_files[keys[13]]) if str(missing_files[keys[13]]) != "0" else "No Combat Level"} || {(str(missing_files[keys[11]])).replace("[", "").replace("]", "").replace("None,", "").replace(", None", "").replace(single_q,"")}\n')
+
                 f.write("|-" + "\n")
         f.write("|-\n|}" + "\n")
         f.write(f"===Removed NPCs===\n{table_creation}!colspan='2'|Removed NPCs{table_creation_2_removed_npcs}")
@@ -385,13 +386,13 @@ def objects_wiki():
     loop_count = 0
 
     with open(f"{out}.txt", "a") as f:
-        f.write(f"==Objects==\n==New Objects=={table_creation}!colspan='3'|Objects{table_creation_2_new_objects}")
+        f.write(f"==Objects==\n===New Objects=== \n{table_creation}!colspan='3'|New Objects{table_creation_2_new_objects}")
         missing = [name for name in names2 if name not in names1]
         deleted = [name for name in names1 if name not in names2]
         for m in missing:
             with open(dir2 + str(m)) as names:
                 missing_files = json.load(names)
-                f.write(f'| [[{str(missing_files[keys[3]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || [[{str(missing_files[keys[15]])}]]\n')
+                f.write(f'| [[{str(missing_files[keys[3]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || {(str(missing_files[keys[15]])).replace("[", "").replace("]", "").replace("None,", "").replace(single_q, "")}]]\n')
                 f.write("|-" + "\n")
         f.write("|-\n|}" + "\n")
 
@@ -444,6 +445,6 @@ def objects_wiki():
         f.write("|}" + "\n\n")
 
 
-items_wiki()
+# items_wiki()
 npcs_wiki()
-objects_wiki()
+# objects_wiki()
