@@ -311,7 +311,8 @@ def npcs_wiki():
         for m in missing:
             with open(dir2 + str(m)) as names:
                 missing_files = json.load(names)
-                f.write(f'| [[{str(missing_files[keys[1]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || {str(missing_files[keys[13]]) if str(missing_files[keys[13]]) != "0" else "No Combat Level"} || {(str(missing_files[keys[11]])).replace("[", "").replace("]", "").replace("None,", "").replace(", None", "").replace(",None","").replace(single_q,"")}\n')
+                t = (str(missing_files[keys[11]]).replace("None, ","").replace(", None","").replace("[","").replace("]","").replace(single_q,""))
+                f.write(f'| [[{str(missing_files[keys[1]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || {str(missing_files[keys[13]]) if str(missing_files[keys[13]]) != "0" else "No Combat Level"} || {t}\n')
 
                 f.write("|-" + "\n")
         f.write("|-\n|}" + "\n")
@@ -392,7 +393,8 @@ def objects_wiki():
         for m in missing:
             with open(dir2 + str(m)) as names:
                 missing_files = json.load(names)
-                f.write(f'| [[{str(missing_files[keys[3]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || {(str(missing_files[keys[15]])).replace("[", "").replace("]", "").replace("None,", "").replace(",None]]","").replace("]]","").replace(single_q, "")}]]\n')
+                t = (str(missing_files[keys[15]]).replace("None, ", "").replace(", None", "").replace("[", "").replace("]", "").replace(single_q, ""))
+                f.write(f'| [[{str(missing_files[keys[3]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || {t}\n')
                 f.write("|-" + "\n")
         f.write("|-\n|}" + "\n")
 
