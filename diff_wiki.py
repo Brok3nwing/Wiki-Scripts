@@ -215,7 +215,7 @@ def items_wiki():
                     missing_files = json.load(names)
 
                     if "Wear" in str(missing_files[keys[19]]) or "Wield" in str(missing_files[keys[19]]):
-                        print(str(missing_files[keys[19]]))
+                        # print(str(missing_files[keys[19]]))
                         file.write(f"{str(missing_files[keys[0]])}\t{str(missing_files[keys[1]])}\n")
 
                     f.write(f'| [[{str(missing_files[keys[1]])}]] '  # Name
@@ -243,7 +243,7 @@ def items_wiki():
             f.write("|-\n|}" + "\n")
 
             print("Writing Diff Items")
-            f.write(f"===Diff Items===\n{table_creation}!colspan='4'|Diff Items{table_creation_2_diff_items}")
+            f.write(f"===Diff Items===\n{table_creation}!colspan='5'|Diff Items{table_creation_2_diff_items}")
             # Item Diffs
             for filename in sorted_names:
                 ext = os.path.splitext(filename)
@@ -325,6 +325,7 @@ def npcs_wiki():
         f.write("|-\n|}" + "\n")
 
         print("Writing Npc diffs")
+        f.write(f"===Diff NPCs===\n{table_creation}!colspan='5'|Diff NPCs{table_creation_2_diff_npcs}")
         for filename in sorted_names:
             ext = os.path.splitext(filename)
             if ext[1] == ".json":
@@ -384,22 +385,27 @@ def objects_wiki():
     loop_count = 0
 
     with open(f"{out}.txt", "a") as f:
-        f.write(f"==Objects==\n{table_creation}!colspan='5'|Objects{table_creation_2}")
+        f.write(f"==Objects==\n==New Objects=={table_creation}!colspan='3'|Objects{table_creation_2_new_objects}")
         missing = [name for name in names2 if name not in names1]
         deleted = [name for name in names1 if name not in names2]
         for m in missing:
             with open(dir2 + str(m)) as names:
                 missing_files = json.load(names)
-                f.write(f'| [[{str(missing_files[keys[3]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || colspan = "4" | New ID\n')
+                f.write(f'| [[{str(missing_files[keys[3]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || [[{str(missing_files[keys[15]])}]]\n')
                 f.write("|-" + "\n")
+        f.write("|-\n|}" + "\n")
 
+        f.write(f"===Removed Objects===\n{table_creation}!colspan='2'|Removed Objects{table_creation_2_removed_objects}")
+        print("Writing removed Objects")
         for m in deleted:
             with open(dir1 + str(m)) as names:
                 missing_files = json.load(names)
-                f.write(f'| [[{str(missing_files[keys[3]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || colspan = "4" | Removed\n')
+                f.write(f'| [[{str(missing_files[keys[3]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}]\n')
                 f.write("|-" + "\n")
+        f.write("|-\n|}" + "\n")
 
         print("Writing Object diffs")
+        f.write(f"===Diff Objects===\n{table_creation}!colspan='5'|Diff Objects{table_creation_2_diff_objects}")
         for filename in sorted_names:
             ext = os.path.splitext(filename)
             if ext[1] == ".json":
@@ -439,5 +445,5 @@ def objects_wiki():
 
 
 items_wiki()
-# npcs_wiki()
-# # objects_wiki()
+npcs_wiki()
+objects_wiki()
