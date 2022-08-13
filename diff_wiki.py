@@ -12,9 +12,25 @@ deleted_string = "Deleted"
 old = input("Old Cache: ")
 new = input("New Cache: ")
 out = input("Output: ")
+
+
 table_creation = '{| class="wikitable sortable"\n'
-table_creation_2 = '\n|-\n! Name !! ID !! Key !! Previous Value !! Changed into\n|-\n'
-table_creation_2_item = '\n|-\n! Name !! ID !! Key !! Previous Value !! New Value !! Members !! Tradeable in GE !! Equipable !! Stackable !! Noteable !! Options !! Placeholder !! Cost\n|-\n'
+
+
+table_creation_2_diff_items = '\n|-\n! Name !! ID !! Key !! Previous Value !! New Value\n|-\n'
+table_creation_2_diff_npcs = '\n|-\n! Name !! ID !! Key !! Previous Value !! New Value\n|-\n'
+table_creation_2_diff_objects = '\n|-\n! Name !! ID !! Members !! Tradeable in GE !! Equipable !! Stackable !! Noteable !! Options !! Placeholder !! Cost\n|-\n'
+
+
+table_creation_2_new_items = '\n|-\n! Name !! ID !! Members !! Tradeable in GE !! Equipable !! Stackable !! Noteable !! Options !! Placeholder !! Cost\n|-\n'
+table_creation_2_new_npcs = '\n|-\n! Name !! ID !! Combat Level !! Options\n|-\n'
+table_creation_2_new_objects = '\n|-\n! Name !! ID !! Options\n|-\n'
+
+table_creation_2_removed_items = '\n|-\n! Name !! ID\n|-\n'
+table_creation_2_removed_npcs = '\n|-\n! Name !! ID\n|-\n'
+table_creation_2_removed_objects = '\n|-\n! Name !! ID\n|-\n'
+
+
 format_options_regex1 = "[\[\]']|None"
 format_options_regex2 = "[\[\]']|None"
 name_array = 0
@@ -189,11 +205,11 @@ def items_wiki():
     with open(f"equipped.txt", "w") as file:
         file.write("ID\tName\tSlot\tAnim\tRotation\n")
         with open(f"{out}.txt", "a") as f:
-            f.write(f"{toc}\n==Items==\n{table_creation}!colspan='13'|Items{table_creation_2_item}")
+            f.write(f"{toc}\n==Items==\n===New Items===\n{table_creation}!colspan='11'|New Items{table_creation_2_new_items}")
             missing = [name for name in names2 if name not in names1]
             deleted = [name for name in names1 if name not in names2]
             single_q = "'"
-            print("Writing Item diffs")
+            print("Writing New Items")
             for m in missing:
                 with open(dir2 + str(m)) as names:
                     missing_files = json.load(names)
@@ -204,7 +220,6 @@ def items_wiki():
 
                     f.write(f'| [[{str(missing_files[keys[1]])}]] '  # Name
                             f'|| [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] '  # ID
-                            f'|| colspan = "3" | New ID '
                             f'|| {"Yes" if str(missing_files[keys[12]]) == "True" else "No"} '  # Members
                             f'|| {"Yes" if str(missing_files[keys[9]]) == "True" else "No"} '  # Tradeable
                             f'|| {"No" if str(missing_files[keys[20]]) == "-1" else "Yes"} '  # male equipped 1
@@ -215,13 +230,21 @@ def items_wiki():
                             f'|| {"No" if str(missing_files[keys[38]]) == "-1" else "Yes"} '  # Placeholder
                             f'|| {str(missing_files[keys[8]])}\n')  # Cost
                     f.write("|-" + "\n")
+            f.write("|-\n|}" + "\n")
 
+            # Removed Items
+            print("Writing Removed Items")
+            f.write(f"===Removed Items===\n{table_creation}!colspan='2'|Removed Items{table_creation_2_removed_items}")
             for m in deleted:
                 with open(dir1 + str(m)) as names:
                     missing_files = json.load(names)
-                    f.write(f'| [[{str(missing_files[keys[1]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || colspan = "3" | Removed\n')
+                    f.write(f'| [[{str(missing_files[keys[1]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}]\n')
                     f.write("|-" + "\n")
+            f.write("|-\n|}" + "\n")
 
+            print("Writing Diff Items")
+            f.write(f"===Diff Items===\n{table_creation}!colspan='4'|Diff Items{table_creation_2_diff_items}")
+            # Item Diffs
             for filename in sorted_names:
                 ext = os.path.splitext(filename)
                 if ext[1] == ".json":
@@ -281,20 +304,25 @@ def npcs_wiki():
     count = 0
 
     with open(f"{out}.txt", "a") as f:
-        f.write(f"==Non-Player Characters==\n{table_creation}!colspan='5'|Non-Player Characters{table_creation_2}")
+        f.write(f"==Non-Player Characters==\n{table_creation}!colspan='4'|Non-Player Characters{table_creation_2_new_npcs}")
+        print("Writing New Npc")
         missing = [name for name in names2 if name not in names1]
         deleted = [name for name in names1 if name not in names2]
         for m in missing:
             with open(dir2 + str(m)) as names:
                 missing_files = json.load(names)
-                f.write(f'| [[{str(missing_files[keys[1]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || colspan = "4" | New ID\n')
+                f.write(f'| [[{str(missing_files[keys[1]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || {str(missing_files[keys[13]])} || {str(missing_files[keys[11]])}\n')
                 f.write("|-" + "\n")
-
+        f.write("|-\n|}" + "\n")
+        f.write(f"===Removed NPCs===\n{table_creation}!colspan='2'|Removed NPCs{table_creation_2_removed_npcs}")
+        print("Writing removed NPcs")
         for m in deleted:
             with open(dir1 + str(m)) as names:
                 missing_files = json.load(names)
-                f.write(f'| [[{str(missing_files[keys[1]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || colspan = "4" | Removed\n')
+
+                f.write(f'| [[{str(missing_files[keys[1]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}]\n')
                 f.write("|-" + "\n")
+        f.write("|-\n|}" + "\n")
 
         print("Writing Npc diffs")
         for filename in sorted_names:
@@ -411,5 +439,5 @@ def objects_wiki():
 
 
 items_wiki()
-npcs_wiki()
-objects_wiki()
+# npcs_wiki()
+# # objects_wiki()
