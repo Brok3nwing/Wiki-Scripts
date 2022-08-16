@@ -18,6 +18,11 @@ def remove_ilegal_characters(string):
     return replaced_name
 
 
+def rename_objects_with_type(string):
+    # 45004_type2
+    replace = re.sub("_type[0-9]*$", "", string)
+    return replace
+
 def rename_item():
     arr = []
     try:
@@ -122,7 +127,7 @@ def rename_chathead():
 def rename_object():
     arr = []
     try:
-        for b in glob("object/*.png"):
+        for b in glob("object/*.png"): # 45004_type2
             id2 = re.sub("object\\\\", "", b)
             id = re.sub(".png", "", id2)
             path_to_json = "C:/AbexRenderer/Cache Definitions/" + rev + "/object_defs/" + id + ".json"
@@ -130,8 +135,10 @@ def rename_object():
                 with open(path_to_json) as n:
                     data = json.load(n)
                     item_name = data["name"]
-                    arr.append(item_name)
-                    if arr.count(item_name) <= 1:  # fewer or equal
+                    n = remove_ilegal_characters(str(item_name))
+                    f = rename_objects_with_type(n)
+                    arr.append(f)
+                    if arr.count(f) <= 1:  # fewer or equal
                         if re.match(illegal_characters_start, item_name):
                             replace_1 = re.sub(illegal_characters_start, "", item_name)
                             replaced_name = re.sub(illegal_characters_end, "", replace_1)
@@ -142,9 +149,9 @@ def rename_object():
                         if re.match(illegal_characters_start, item_name):
                             replace_1 = re.sub(illegal_characters_start, "", item_name)
                             replaced_name = re.sub(illegal_characters_end, "", replace_1)
-                            os.rename(b, f"object/{replaced_name} ({arr.count(item_name)}).png")
+                            os.rename(b, f"object/{replaced_name} ({arr.count(f)}).png")
                         else:
-                            os.rename(b, f"object/{item_name} ({arr.count(item_name)}).png")
+                            os.rename(b, f"object/{item_name} ({arr.count(f)}).png")
             else:
                 pass
     except:
@@ -162,7 +169,8 @@ def rename_npc():
                 with open(path_to_json) as n:
                     data = json.load(n)
                     item_name = data["name"]
-                    if arr.count(str(item_name).upper()) == 0:  # fewer or equal to 1
+                    n = remove_ilegal_characters(str(item_name))
+                    if arr.count(str(n).upper()) == 0:  # fewer or equal to 1 - Condition checks for stuff like COL
                         if re.match(illegal_characters_start, item_name):
                             replace_1 = re.sub(illegal_characters_start, "", item_name)
                             replaced_name = re.sub(illegal_characters_end, "", replace_1)
@@ -175,10 +183,10 @@ def rename_npc():
                         if re.match(illegal_characters_start, item_name):
                             replace_1 = re.sub(illegal_characters_start, "", item_name)
                             replaced_name = re.sub(illegal_characters_end, "", replace_1)
-                            os.rename(b, f"npc/{replaced_name} ({arr.count(str(item_name).upper())}).png")
+                            os.rename(b, f"npc/{replaced_name} ({arr.count(str(n).upper())}).png")
                             arr.append(str(remove_ilegal_characters(item_name)).upper())
                         else:
-                            os.rename(b, f"npc/{item_name} ({arr.count(str(item_name).upper())}).png")
+                            os.rename(b, f"npc/{item_name} ({arr.count(str(n).upper())}).png")
                             arr.append(str(remove_ilegal_characters(item_name)).upper())
 
             else:
