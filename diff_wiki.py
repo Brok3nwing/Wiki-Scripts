@@ -2,10 +2,8 @@ import json
 import os
 import possible_keys
 import natsort
-import argparse
 import re
-import xlsxwriter
-import csv
+import colorsys
 
 
 deleted_string = "Deleted"
@@ -41,6 +39,37 @@ old_dir = f"C:/AbexRenderer/Cache Definitions/{old}/"
 new_dir = f"C:/AbexRenderer/Cache Definitions/{new}/"
 occ = []
 
+
+def convert_color_to_hls(number):
+    def get_hue():
+        h = number / 1024
+        l = h * 5.625
+        if l < 0:
+            return int(360 + (l))
+        else:
+            return int(l)
+
+    def get_lightness():
+        h = number % 128
+        return int(h * 0.591)
+
+
+    def get_saturation():
+        h = number / 1024
+        l = h % 1
+        return int(round(l, 2) * 100)
+
+    def hsl_to_rgb():
+        frac = colorsys.hls_to_rgb(get_hue()/360, get_lightness()/100, get_saturation()/100)
+        return frac[0]*255, frac[1]*255, frac[2]*255
+
+    def rgb_to_hex():
+        t = (int(hsl_to_rgb()[0]), int(hsl_to_rgb()[1]), int(hsl_to_rgb()[2]))
+        hex_color = '%02x%02x%02x' % t
+
+        return hex_color
+
+    return rgb_to_hex()
 
 def format_options(rgx_list, text):
     new_text = text
