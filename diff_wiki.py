@@ -235,6 +235,7 @@ def items_wiki():
     with open(f"equipped.txt", "w") as file:
         file.write("ID\tName\tSlot\tAnim\tRotation\n")
         with open(f"{out}.txt", "a") as f:
+            comma_count = 0
             f.write(f"{toc}\n==Items==\n===New Items===\n{table_creation}!colspan='11'|New Items{table_creation_2_new_items}")
             missing = [name for name in names2 if name not in names1]
             deleted = [name for name in names1 if name not in names2]
@@ -301,13 +302,17 @@ def items_wiki():
                                                 color = convert_jagex_color_to_hex(i)
                                                 f.write(f'<span style = "background-color: #{color};color:white">{i}</span>')
                                                 if len(list(changed_value1)) > 1:
-                                                    f.write(",")
+                                                    if comma_count < (len(list(changed_value1)) - 1):
+                                                        f.write(",")
+                                                        comma_count += 1
                                             f.write("||")
                                             for i in changed_value2:
                                                 color2 = convert_jagex_color_to_hex(i)
                                                 f.write(f'<span style = "background-color: #{color2};color:white">{i}</span>')
                                                 if len(list(changed_value2)) > 1:
-                                                    f.write(",")
+                                                    if comma_count < (len(list(changed_value2)) - 1):
+                                                        f.write(",")
+                                                        comma_count += 1
                                             f.write("\n")
 
                                         else:
@@ -320,20 +325,24 @@ def items_wiki():
                                         if str(change) == "name":
                                             f.write(f"| {str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
                                         elif str(change) == "colorFind" or str(change) == "colorReplace":
+                                            comma_count = 0
                                             f.write(f'| {str(change)} ||')
                                             for i in changed_value1:
                                                 color = convert_jagex_color_to_hex(i)
                                                 f.write(f'<span style = "background-color: #{color};color:white">{i}</span>')
                                                 if len(list(changed_value1)) > 1:
-
-                                                    f.write(",")
+                                                    if comma_count < (len(list(changed_value1)) - 1):
+                                                        f.write(",")
+                                                        comma_count += 1
                                             f.write("||")
+                                            comma_count = 0
                                             for i in changed_value2:
                                                 color2 = convert_jagex_color_to_hex(i)
                                                 f.write(f'<span style = "background-color: #{color2};color:white">{i}</span>')
                                                 if len(list(changed_value2)) > 1:
-
-                                                    f.write(",")
+                                                    if comma_count < (len(list(changed_value2)) - 1):
+                                                        f.write(",")
+                                                        comma_count += 1
                                             f.write("\n")
 
                                         else:
