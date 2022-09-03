@@ -40,7 +40,7 @@ new_dir = f"C:/AbexRenderer/Cache Definitions/{new}/"
 occ = []
 
 
-def convert_color_to_hls(number):
+def convert_jagex_color_to_hex(number):
     def get_hue():
         h = number / 1024
         l = h * 5.625
@@ -93,7 +93,7 @@ def get_same_key_count_items():
 
     for filename in sorted_names:
         count += 1
-        if count % 100 == 0:
+        if count % 5000 == 0:
             print(count)
         ext = os.path.splitext(filename)
         if ext[1] == ".json":
@@ -295,6 +295,21 @@ def items_wiki():
                                         f.write("|-" + "\n")
                                         if str(change) == "name":
                                             f.write(f"|{str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
+                                        elif str(change) == "colorFind" or str(change) == "colorReplace":
+                                            f.write(f'| {str(change)} ||')
+                                            for i in changed_value1:
+                                                color = convert_jagex_color_to_hex(i)
+                                                f.write(f'<span style = "background-color: #{color};color:white">{i}</span>')
+                                                if len(list(changed_value1)) > 1:
+                                                    f.write(",")
+                                            f.write("||")
+                                            for i in changed_value2:
+                                                color2 = convert_jagex_color_to_hex(i)
+                                                f.write(f'<span style = "background-color: #{color2};color:white">{i}</span>')
+                                                if len(list(changed_value2)) > 1:
+                                                    f.write(",")
+                                            f.write("\n")
+
                                         else:
                                             f.write(f"|{str(change)} || {str(changed_value1)} || {str(changed_value2)}\n")
                                         f.write("|-" + "\n")
@@ -304,6 +319,23 @@ def items_wiki():
                                         # print(f"|{str(change)} || {str(changed_value1)} || {str(changed_value2)}\n")
                                         if str(change) == "name":
                                             f.write(f"| {str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
+                                        elif str(change) == "colorFind" or str(change) == "colorReplace":
+                                            f.write(f'| {str(change)} ||')
+                                            for i in changed_value1:
+                                                color = convert_jagex_color_to_hex(i)
+                                                f.write(f'<span style = "background-color: #{color};color:white">{i}</span>')
+                                                if len(list(changed_value1)) > 1:
+
+                                                    f.write(",")
+                                            f.write("||")
+                                            for i in changed_value2:
+                                                color2 = convert_jagex_color_to_hex(i)
+                                                f.write(f'<span style = "background-color: #{color2};color:white">{i}</span>')
+                                                if len(list(changed_value2)) > 1:
+
+                                                    f.write(",")
+                                            f.write("\n")
+
                                         else:
                                             f.write(f"| {str(change)} || {str(changed_value1)} || {str(changed_value2)}\n")
                                         f.write("|-" + "\n")
@@ -477,5 +509,5 @@ def objects_wiki():
 
 
 items_wiki()
-npcs_wiki()
-objects_wiki()
+# npcs_wiki()
+# objects_wiki()
