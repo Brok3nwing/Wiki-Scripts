@@ -35,8 +35,12 @@ format_options_regex2 = "[\[\]']|None"
 name_array = 0
 o = 0
 
-old_dir = f"C:/AbexRenderer/Cache Definitions/{old}/"
-new_dir = f"C:/AbexRenderer/Cache Definitions/{new}/"
+# old_dir = f"C:/AbexRenderer/Cache Definitions/{old}/"
+# new_dir = f"C:/AbexRenderer/Cache Definitions/{new}/"
+
+old_dir = f"E:/Cache Definitions/{old}/"
+new_dir = f"E:/Cache Definitions/{new}/"
+
 occ = []
 
 
@@ -420,7 +424,7 @@ def npcs_wiki():
                                     if str(change) == "name":
                                         f.write(
                                             f"|{str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
-                                    elif str(change) == "colorFind" or str(change) == "colorReplace":
+                                    elif str(change) == "recolorToFind" or str(change) == "recolorToReplace":
                                         f.write(f'| {str(change)} ||')
                                         for i in changed_value1:
                                             color = convert_jagex_color_to_hex(i)
@@ -451,7 +455,7 @@ def npcs_wiki():
                                     if str(change) == "name":
                                         f.write(
                                             f"| {str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
-                                    elif str(change) == "colorFind" or str(change) == "colorReplace":
+                                    elif str(change) == "recolorToFind" or str(change) == "recolorToReplace":
                                         comma_count = 0
                                         f.write(f'| {str(change)} ||')
                                         for i in changed_value1:
@@ -546,7 +550,7 @@ def objects_wiki():
                                     if str(change) == "name":
                                         f.write(
                                             f"|{str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
-                                    elif str(change) == "colorFind" or str(change) == "colorReplace":
+                                    elif str(change) == "recolorToFind" or str(change) == "recolorToReplace":
                                         f.write(f'| {str(change)} ||')
                                         for i in changed_value1:
                                             color = convert_jagex_color_to_hex(i)
@@ -577,7 +581,7 @@ def objects_wiki():
                                     if str(change) == "name":
                                         f.write(
                                             f"| {str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
-                                    elif str(change) == "colorFind" or str(change) == "colorReplace":
+                                    elif str(change) == "recolorToFind" or str(change) == "recolorToReplace":
                                         comma_count = 0
                                         f.write(f'| {str(change)} ||')
                                         for i in changed_value1:
@@ -610,5 +614,5 @@ def objects_wiki():
 
 
 items_wiki()
-# npcs_wiki()
-# objects_wiki()
+npcs_wiki()
+objects_wiki()
