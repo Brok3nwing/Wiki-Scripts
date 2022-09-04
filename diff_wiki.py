@@ -15,18 +15,18 @@ out = input("Output: ")
 table_creation = '{| class="wikitable sortable"\n'
 
 
-table_creation_2_diff_items = '\n|-\n! Name !! ID !! Key !! Previous Value !! New Value\n|-\n'
-table_creation_2_diff_npcs = '\n|-\n! Name !! ID !! Key !! Previous Value !! New Value\n|-\n'
-table_creation_2_diff_objects = '\n|-\n! Name !! ID !! Key !! Previous Value !! New Value\n|-\n'
+table_creation_2_diff_items = '\n|-\n! style=width:15em | Name !! ID !! Key !! Previous Value !! New Value\n|-\n'
+table_creation_2_diff_npcs = '\n|-\n! style=width:15em | Name !! ID !! Key !! Previous Value !! New Value\n|-\n'
+table_creation_2_diff_objects = '\n|-\n! style=width:15em | Name !! ID !! Key !! Previous Value !! New Value\n|-\n'
 
 
-table_creation_2_new_items = '\n|-\n! Name !! ID !! Members !! Tradeable in GE !! Equipable !! Stackable !! Noteable !! Options !! Placeholder !! Cost\n|-\n'
-table_creation_2_new_npcs = '\n|-\n! Name !! ID !! Combat Level !! Options\n|-\n'
-table_creation_2_new_objects = '\n|-\n! Name !! ID !! Options\n|-\n'
+table_creation_2_new_items = '\n|-\n! style=width:15em | Name !! ID !! Members !! Tradeable in GE !! Equipable !! Stackable !! Noteable !! Options !! Placeholder !! Cost\n|-\n'
+table_creation_2_new_npcs = '\n|-\n! style=width:15em | Name !! ID !! Combat Level !! Options\n|-\n'
+table_creation_2_new_objects = '\n|-\n! style=width:15em | Name !! ID !! Options\n|-\n'
 
-table_creation_2_removed_items = '\n|-\n! Name !! ID\n|-\n'
-table_creation_2_removed_npcs = '\n|-\n! Name !! ID\n|-\n'
-table_creation_2_removed_objects = '\n|-\n! Name !! ID\n|-\n'
+table_creation_2_removed_items = '\n|-\n! style=width:15em | Name !! ID\n|-\n'
+table_creation_2_removed_npcs = '\n|-\n! style=width:15em | Name !! ID\n|-\n'
+table_creation_2_removed_objects = '\n|-\n! style=width:15em | Name !! ID\n|-\n'
 
 single_q = "'"
 
@@ -301,6 +301,7 @@ def items_wiki():
                                         if str(change) == "name":
                                             f.write(f"|{str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
                                         elif str(change) == "colorFind" or str(change) == "colorReplace":
+                                            comma_count = 0
                                             f.write(f'| {str(change)} ||')
                                             for i in changed_value1:
                                                 color = convert_jagex_color_to_hex(i)
@@ -310,6 +311,7 @@ def items_wiki():
                                                         f.write(",")
                                                         comma_count += 1
                                             f.write("||")
+                                            comma_count = 0
                                             for i in changed_value2:
                                                 color2 = convert_jagex_color_to_hex(i)
                                                 f.write(f'<span style = "background-color: #{color2};color:white">{i}</span>')
@@ -378,6 +380,7 @@ def npcs_wiki():
     count = 0
 
     with open(f"{out}.txt", "a") as f:
+        comma_count = 0
         f.write(f"==Non-Player Characters==\n===New NPCs===\n{table_creation}!colspan='4'|New NPCs{table_creation_2_new_npcs}")
         print("Writing New Npc")
         missing = [name for name in names2 if name not in names1]
@@ -425,22 +428,27 @@ def npcs_wiki():
                                         f.write(
                                             f"|{str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
                                     elif str(change) == "recolorToFind" or str(change) == "recolorToReplace":
+                                        comma_count = 0
                                         f.write(f'| {str(change)} ||')
                                         for i in changed_value1:
                                             color = convert_jagex_color_to_hex(i)
                                             f.write(
                                                 f'<span style = "background-color: #{color};color:white">{i}</span>')
                                             if len(list(changed_value1)) > 1:
+                                                print(f"Length of {list(changed_value1)} : {len(list(changed_value1))} and comma_count {comma_count}")
                                                 if comma_count < (len(list(changed_value1)) - 1):
                                                     f.write(",")
                                                     comma_count += 1
                                         f.write("||")
+                                        comma_count = 0
                                         for i in changed_value2:
                                             color2 = convert_jagex_color_to_hex(i)
                                             f.write(
                                                 f'<span style = "background-color: #{color2};color:white">{i}</span>')
                                             if len(list(changed_value2)) > 1:
+                                                print(f"Length of {list(changed_value2)} : {len(list(changed_value2))} and comma_count {comma_count}")
                                                 if comma_count < (len(list(changed_value2)) - 1):
+                                                    print(f"+adding comma")
                                                     f.write(",")
                                                     comma_count += 1
                                         f.write("\n")
@@ -507,6 +515,7 @@ def objects_wiki():
     loop_count = 0
 
     with open(f"{out}.txt", "a") as f:
+        comma_count = 0
         f.write(f"==Objects==\n===New Objects=== \n{table_creation}!colspan='3'|New Objects{table_creation_2_new_objects}")
         missing = [name for name in names2 if name not in names1]
         deleted = [name for name in names1 if name not in names2]
@@ -551,6 +560,7 @@ def objects_wiki():
                                         f.write(
                                             f"|{str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
                                     elif str(change) == "recolorToFind" or str(change) == "recolorToReplace":
+                                        comma_count = 0
                                         f.write(f'| {str(change)} ||')
                                         for i in changed_value1:
                                             color = convert_jagex_color_to_hex(i)
@@ -561,6 +571,7 @@ def objects_wiki():
                                                     f.write(",")
                                                     comma_count += 1
                                         f.write("||")
+                                        comma_count = 0
                                         for i in changed_value2:
                                             color2 = convert_jagex_color_to_hex(i)
                                             f.write(
