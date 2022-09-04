@@ -418,16 +418,62 @@ def npcs_wiki():
                                     f.write(f'|rowspan="{z[0]+1}"|[{base_moid_url}{str(json2[keys[0]])} {str(json2[keys[0]])}]\n')
                                     f.write("|-" + "\n")
                                     if str(change) == "name":
-                                        f.write(f"|{str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
+                                        f.write(
+                                            f"|{str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
+                                    elif str(change) == "colorFind" or str(change) == "colorReplace":
+                                        f.write(f'| {str(change)} ||')
+                                        for i in changed_value1:
+                                            color = convert_jagex_color_to_hex(i)
+                                            f.write(
+                                                f'<span style = "background-color: #{color};color:white">{i}</span>')
+                                            if len(list(changed_value1)) > 1:
+                                                if comma_count < (len(list(changed_value1)) - 1):
+                                                    f.write(",")
+                                                    comma_count += 1
+                                        f.write("||")
+                                        for i in changed_value2:
+                                            color2 = convert_jagex_color_to_hex(i)
+                                            f.write(
+                                                f'<span style = "background-color: #{color2};color:white">{i}</span>')
+                                            if len(list(changed_value2)) > 1:
+                                                if comma_count < (len(list(changed_value2)) - 1):
+                                                    f.write(",")
+                                                    comma_count += 1
+                                        f.write("\n")
+
                                     else:
                                         f.write(f"|{str(change)} || {str(changed_value1)} || {str(changed_value2)}\n")
                                     f.write("|-" + "\n")
                                     z.pop(0)
-                                    if loop_count >= 1:g.pop(0)
+                                    if loop_count >= 1: g.pop(0)
                                 else:
                                     # print(f"|{str(change)} || {str(changed_value1)} || {str(changed_value2)}\n")
                                     if str(change) == "name":
-                                        f.write(f"| {str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
+                                        f.write(
+                                            f"| {str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
+                                    elif str(change) == "colorFind" or str(change) == "colorReplace":
+                                        comma_count = 0
+                                        f.write(f'| {str(change)} ||')
+                                        for i in changed_value1:
+                                            color = convert_jagex_color_to_hex(i)
+                                            f.write(
+                                                f'<span style = "background-color: #{color};color:white">{i}</span>')
+                                            if len(list(changed_value1)) > 1:
+                                                if comma_count < (len(list(changed_value1)) - 1):
+                                                    f.write(",")
+                                                    comma_count += 1
+                                        f.write("||")
+                                        comma_count = 0
+                                        for i in changed_value2:
+                                            color2 = convert_jagex_color_to_hex(i)
+                                            f.write(
+                                                f'<span style = "background-color: #{color2};color:white">{i}</span>')
+                                            if len(list(changed_value2)) > 1:
+                                                if comma_count < (len(list(changed_value2)) - 1):
+                                                    f.write(",")
+                                                    comma_count += 1
+                                        f.write("\n")
+
                                     else:
                                         f.write(f"| {str(change)} || {str(changed_value1)} || {str(changed_value2)}\n")
                                     f.write("|-" + "\n")
@@ -498,16 +544,62 @@ def objects_wiki():
                                     f.write(f'|rowspan="{z[0]+1}"|[{base_moid_url}{str(json2[keys[0]])} {str(json2[keys[0]])}]\n')
                                     f.write("|-" + "\n")
                                     if str(change) == "name":
-                                        f.write(f"|{str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
+                                        f.write(
+                                            f"|{str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
+                                    elif str(change) == "colorFind" or str(change) == "colorReplace":
+                                        f.write(f'| {str(change)} ||')
+                                        for i in changed_value1:
+                                            color = convert_jagex_color_to_hex(i)
+                                            f.write(
+                                                f'<span style = "background-color: #{color};color:white">{i}</span>')
+                                            if len(list(changed_value1)) > 1:
+                                                if comma_count < (len(list(changed_value1)) - 1):
+                                                    f.write(",")
+                                                    comma_count += 1
+                                        f.write("||")
+                                        for i in changed_value2:
+                                            color2 = convert_jagex_color_to_hex(i)
+                                            f.write(
+                                                f'<span style = "background-color: #{color2};color:white">{i}</span>')
+                                            if len(list(changed_value2)) > 1:
+                                                if comma_count < (len(list(changed_value2)) - 1):
+                                                    f.write(",")
+                                                    comma_count += 1
+                                        f.write("\n")
+
                                     else:
                                         f.write(f"|{str(change)} || {str(changed_value1)} || {str(changed_value2)}\n")
                                     f.write("|-" + "\n")
                                     z.pop(0)
-                                    if loop_count >= 1:g.pop(0)
+                                    if loop_count >= 1: g.pop(0)
                                 else:
                                     # print(f"|{str(change)} || {str(changed_value1)} || {str(changed_value2)}\n")
                                     if str(change) == "name":
-                                        f.write(f"| {str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
+                                        f.write(
+                                            f"| {str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
+                                    elif str(change) == "colorFind" or str(change) == "colorReplace":
+                                        comma_count = 0
+                                        f.write(f'| {str(change)} ||')
+                                        for i in changed_value1:
+                                            color = convert_jagex_color_to_hex(i)
+                                            f.write(
+                                                f'<span style = "background-color: #{color};color:white">{i}</span>')
+                                            if len(list(changed_value1)) > 1:
+                                                if comma_count < (len(list(changed_value1)) - 1):
+                                                    f.write(",")
+                                                    comma_count += 1
+                                        f.write("||")
+                                        comma_count = 0
+                                        for i in changed_value2:
+                                            color2 = convert_jagex_color_to_hex(i)
+                                            f.write(
+                                                f'<span style = "background-color: #{color2};color:white">{i}</span>')
+                                            if len(list(changed_value2)) > 1:
+                                                if comma_count < (len(list(changed_value2)) - 1):
+                                                    f.write(",")
+                                                    comma_count += 1
+                                        f.write("\n")
+
                                     else:
                                         f.write(f"| {str(change)} || {str(changed_value1)} || {str(changed_value2)}\n")
                                     f.write("|-" + "\n")
