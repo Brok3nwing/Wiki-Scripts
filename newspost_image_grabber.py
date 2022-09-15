@@ -42,6 +42,8 @@ def get_image_count():
     for url in urls:
         if re.search("newspost", url):
             l.append(url)
+        elif re.search("thumbnail/Button", url):
+            l.append(url)
     # print(list(dict.fromkeys(l)))
     return len(l), len(set(l)), list(dict.fromkeys(l))
 
