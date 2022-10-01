@@ -25,8 +25,8 @@ def read_data():
         item_id.append(int(df.id[i]) + 512)
         item_name.append(df.fillna("").name[i])
         item_slot.append(df.slot[i])
-        item_anim.append(int(df.anim[i]))
-        item_rota.append(int(df.rotation[i]))
+        item_anim.append(int(df.fillna(0).anim[i]))
+        item_rota.append(int(df.fillna(0).rotation[i]))
         item_render_set.append(int(df.render_set[i]))
 
     cache_version = df.cache_version
@@ -86,15 +86,25 @@ def render_single_items():
 
 
 
-        male_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {male_player_kit} --playercolors {male_player_colors} --poseanim {anim[i]} --yan2d {rota[i]} --cache E:/Caches/{version[0]}/cache --out {out}"
-        female_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {female_player_kit} --playercolors {female_player_colors} --playerfemale --anim {anim[i]} --yan2d {rota[i]} --cache E:/Caches/{version[0]}/cache --out {out}"
+        male_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {male_player_kit} --playercolors {male_player_colors} --poseanim {808 if anim[i] == 0 else anim[i]} --yan2d {128 if rota[i] == 0 else rota[i]} --cache E:/Caches/{version[0]}/cache --out {out}/male"
+        female_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {female_player_kit} --playercolors {female_player_colors} --playerfemale --anim {808 if anim[i] == 0 else anim[i]} --yan2d {128 if rota[i] == 0 else rota[i]} --cache E:/Caches/{version[0]}/cache --out {out}/female"
 
-        subprocess.call(male_proc)
-        subprocess.call(female_proc)
-        print(f"(female) {name[i]} : {female_player_kit}")
-        print(f"(male) {name[i]} : {male_player_kit}")
-        os.rename(f"{out}/player/[{male_player_kit.replace(',', ', ')}]_[{male_player_colors.replace(',', ', ')}].png",f"{out}/player/{get_item_name_from_cache(id[i] - 512) if name[i] == '' else name[i]} equipped male.png")
-        os.rename(f"{out}/player/[{female_player_kit.replace(',', ', ')}]_[{female_player_colors.replace(',', ', ')}].png",f"{out}/player/{get_item_name_from_cache(id[i] - 512) if name[i] == '' else name[i]} equipped female.png")
+
+        # print(f"(female) {name[i]} : {female_player_kit}")
+        # print(f"(male) {name[i]} : {male_player_kit}")
+
+        pre_render_male_equipped_name = f"{out}/male/player/[{male_player_kit.replace(',', ', ')}]_[{male_player_colors.replace(',', ', ')}].png"
+        pre_render_female_equipped_name = f"{out}/female/player/[{female_player_kit.replace(',', ', ')}]_[{female_player_colors.replace(',', ', ')}].png"
+
+        render_male_equipped_name = f"{out}/male/player/{get_item_name_from_cache(id[i] - 512) if name[i] == '' else name[i]} equipped male.png"
+        render_female_equipped_name = f"{out}/female/player/{get_item_name_from_cache(id[i] - 512) if name[i] == '' else name[i]} equipped female.png"
+
+        if not os.path.isfile(render_male_equipped_name):
+            subprocess.call(male_proc)
+            os.rename(pre_render_male_equipped_name, render_male_equipped_name)
+        elif not os.path.isfile(render_female_equipped_name):
+            subprocess.call(female_proc)
+            os.rename(pre_render_female_equipped_name, render_female_equipped_name)
 
 def render_sets():
     id, name, slot, anim, rota, set = read_data()
