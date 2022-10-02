@@ -1,8 +1,8 @@
 import subprocess
 import os
-import numpy as np
 import pandas as pd
 import json
+from itertools import cycle
 
 
 #  male default kit [0, 0, 0, 0, 363, 0, 342, 356, 259, 289, 298, 270]
@@ -27,7 +27,7 @@ def read_data():
         item_slot.append(df.slot[i])
         item_anim.append(int(df.fillna(0).anim[i]))
         item_rota.append(int(df.fillna(0).rotation[i]))
-        item_render_set.append(int(df.render_set[i]))
+        item_render_set.append(df.fillna("").render_set[i])
 
     cache_version = df.cache_version
     return item_id, item_name, item_slot, item_anim, item_rota, item_render_set, cache_version
@@ -107,36 +107,57 @@ def render_single_items():
             os.rename(pre_render_female_equipped_name, render_female_equipped_name)
 
 def render_sets():
-    id, name, slot, anim, rota, set = read_data()
-    sets = {}
-    # sets = {int(set[0]) : [name[0]]}
+    male_player_colors = "0,3,15,1,0"
+    id, name, slot, anim, rota, armour_set, version = read_data()
+    sets = set()
+    full_set = {}
+    for x in range(len(armour_set)):
+        if armour_set[x] != "":
+            sets.add(armour_set[x])
 
-    x = {int(set[0]) : [name[0]]}
-    y = {int(set[1]): [name[1]]}
-    sets.update(x)
-    sets.update(y)
+    for x in range(len(sets)):
+        full_set = {
+            list(sets)[x]:
+                {
+                    "head": 0,
+                    "cape": 0,
+                    "neck": 0,
+                    "weapon": 0,
+                    "chest": 363,
+                    "shield": 0,
+                    "arms": 342,
+                    "legs": 356,
+                    "hair": 259,
+                    "hands": 289,
+                    "feet": 298,
+                    "jaw": 270,
+                }
+        }
+        for y in range(len(armour_set)):
+            if armour_set[y] != "":
+                if armour_set[y] == list(sets)[x]:
+                    full_set[list(sets)[x]][slot[y]] = id[y]
+                    if slot[y] == "chest":
+                        full_set[list(sets)[x]]["arms"] = 0
+                    elif slot[y] == "head":
+                        full_set[list(sets)[x]]["hair"] = 0
+                        full_set[list(sets)[x]]["jaw"] = 0
+        male_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {convert_to_player_kit(full_set)} --playercolors {male_player_colors} --poseanim 808 --yan2d 128 --cache E:/Caches/{version[0]}/cache --out out99/male"
+        print(male_proc)
+        subprocess.call(male_proc)
 
-    print(sets)
-    # for i in range(len(set)):
-    #     if set[i] > 0:
-    #         sets[] = [name[i]]
-
-    # male_player_kit = f"{str(id[i]) if slot[i] == 'head' else 0}," \
-    #                   f"{str(id[i]) if slot[i] == 'cape' else 0}," \
-    #                   f"{str(id[i]) if slot[i] == 'neck' else 0}," \
-    #                   f"{str(id[i]) if slot[i] == 'weapon' else 0}," \
-    #                   f"{str(id[i]) if slot[i] == 'chest' else 363}," \
-    #                   f"{str(id[i]) if slot[i] == 'shield' else 0}," \
-    #                   f"{0 if slot[i] == 'chest' else 342}," \
-    #                   f"{str(id[i]) if slot[i] == 'legs' else 356}," \
-    #                   f"{str(id[i]) if slot[i] == 'hair' else 259}," \
-    #                   f"{str(id[i]) if slot[i] == 'hands' else 289}," \
-    #                   f"{str(id[i]) if slot[i] == 'feet' else 298}," \
-    #                   f"{str(id[i]) if slot[i] == 'jaw' else 270}"
-
-    # if set.count(1) > 1:
-    #     subprocess.call(
-    #         f"java -jar E:/Renderer/renderer-all.jar --playerkit  --playercolors {male_player_colors} --anim {anim} --yan2d {rota} --cache E:/Caches/{version[0]}/cache2 --out {out}")
 
 
-render_single_items()
+
+def convert_to_player_kit(kit : dict):
+    player_kit = []
+    final_kit = ","
+    for i in kit.keys():
+        for j, b in kit[i].items():
+            player_kit.append(str(b))
+
+    return final_kit.join(player_kit)
+
+
+# render_single_items()
+render_sets()
