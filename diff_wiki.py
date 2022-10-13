@@ -20,7 +20,7 @@ table_creation_2_diff_npcs = '\n|-\n! style=width:15em | Name !! ID !! Key !! Pr
 table_creation_2_diff_objects = '\n|-\n! style=width:15em | Name !! ID !! Key !! Previous Value !! New Value\n|-\n'
 
 
-table_creation_2_new_items = '\n|-\n! style=width:15em | Name !! ID !! Members !! Tradeable in GE !! Equipable !! Stackable !! Noteable !! Options !! Placeholder !! Cost\n|-\n'
+table_creation_2_new_items = '\n|-\n! style=width:15em | Name !! ID !! Members !! Tradeable in GE !! Equipable !! Stackable !! Noteable !! Options !! Placeholder !! Cost !! Weight\n|-\n'
 table_creation_2_new_npcs = '\n|-\n! style=width:15em | Name !! ID !! Combat Level !! Options\n|-\n'
 table_creation_2_new_objects = '\n|-\n! style=width:15em | Name !! ID !! Options\n|-\n'
 
@@ -38,8 +38,8 @@ o = 0
 # old_dir = f"C:/AbexRenderer/Cache Definitions/{old}/"
 # new_dir = f"C:/AbexRenderer/Cache Definitions/{new}/"
 
-old_dir = f"E:/Cache Definitions/{old}/"
-new_dir = f"E:/Cache Definitions/{new}/"
+old_dir = f"E:/Caches/{old}/definitions/"
+new_dir = f"E:/Caches/{new}/definitions/"
 
 occ = []
 
@@ -135,6 +135,7 @@ def get_same_key_count_npcs():
 
     for filename in sorted_names:
         count += 1
+        print(filename)
         ext = os.path.splitext(filename)
         if ext[1] == ".json":
             json1 = json.load(open(os.path.join(dir1, filename)))
@@ -247,22 +248,38 @@ def items_wiki():
             for m in missing:
                 with open(dir2 + str(m)) as names:
                     missing_files = json.load(names)
-
+                    with open(f"{str(missing_files[keys[1]])}.txt", "w") as new_item_page:
+                        new_item_page.write(f"{{{{Infobox Item\n"
+                                            f"|name = {str(missing_files[keys[1]])}\n"
+                                            f"|image = [[File:{str(missing_files[keys[1]])}.png]]\n"
+                                            f"|release = [[17 October]] [[2022]]\n"
+                                            f"|update = \n"
+                                            f"|members = {'Yes' if str(missing_files[keys[12]]) == 'True' else 'No'}\n"
+                                            f"|quest = \n"
+                                            f"|tradeable = {'Yes' if str(missing_files[keys[9]]) == 'True' else 'No'}\n"
+                                            f"|placeholder = {'No' if str(missing_files[keys[38]]) == '-1' else 'Yes'}\n"
+                                            f"|equipable = {'Yes' if 'Wear' in str(missing_files[keys[19]]) or 'Wield' in str(missing_files[keys[19]]) else 'No'}\n"
+                                            f"|stackable = {'No' if str(missing_files[keys[10]]) == '0' else 'Yes'}\n"
+                                            f"|noteable = {'No' if str(missing_files[keys[32]]) == '-1' else 'Yes'}\n"
+                                            f"|options = {(str(missing_files[keys[19]])).replace('[', '').replace(']', '').replace('None,', '').replace(single_q, '').replace('Drop', '').replace(',Drop', '')}\n"
+                                            f"|destroy = ")
                     if "Wear" in str(missing_files[keys[19]]) or "Wield" in str(missing_files[keys[19]]):
-                        # print(str(missing_files[keys[19]]))
+
                         file.write(f"{str(missing_files[keys[0]])}\t{str(missing_files[keys[1]])}\n")
 
                     f.write(f'| [[{str(missing_files[keys[1]])}]] '  # Name
                             f'|| [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] '  # ID
-                            f'|| {"Yes" if str(missing_files[keys[12]]) == "True" else "No"} '  # Members
+                            f'|| {"Yes" if str(missing_files[keys[15]]) == "True" else "No"} '  # Members
                             f'|| {"Yes" if str(missing_files[keys[9]]) == "True" else "No"} '  # Tradeable
-                            f'|| {"No" if str(missing_files[keys[20]]) == "-1" else "Yes"} '  # male equipped 1
+                            f'|| {"No" if str(missing_files[keys[23]]) == "-1" else "Yes"} '  # male equipped 1
                             f'|| {"No" if str(missing_files[keys[10]]) == "0" else "Yes"} '  # Stackable
-                            f'|| {"No" if str(missing_files[keys[32]]) == "-1" else "Yes"} '  # Noteable
+                            f'|| {"No" if str(missing_files[keys[35]]) == "-1" else "Yes"} '  # Noteable
                             # f'|| {format_options(format_options_regex1, str(missing_files[keys[19]]))} '  # InterfaceOptions
-                            f'|| {(str(missing_files[keys[19]])).replace("[", "").replace("]", "").replace("None,", "").replace(single_q, "")} '  # InterfaceOptions
-                            f'|| {"No" if str(missing_files[keys[38]]) == "-1" else "Yes"} '  # Placeholder
-                            f'|| {str(missing_files[keys[8]])}\n')  # Cost
+                            f'|| {(str(missing_files[keys[22]])).replace("[", "").replace("]", "").replace("None,", "").replace(single_q, "")} '  # InterfaceOptions
+                            f'|| {"No" if str(missing_files[keys[42]]) == "-1" else "Yes"} '  # Placeholder
+                            f'|| {str(missing_files[keys[8]])}\n' # Cost
+                            f'|| {str(missing_files[keys[38]])}\n' # Weight
+                            )
                     f.write("|-" + "\n")
             f.write("|-\n|}" + "\n")
 
@@ -388,8 +405,8 @@ def npcs_wiki():
         for m in missing:
             with open(dir2 + str(m)) as names:
                 missing_files = json.load(names)
-                t = (str(missing_files[keys[11]]).replace("None, ","").replace(", None","").replace("[","").replace("]","").replace(single_q,""))
-                f.write(f'| [[{str(missing_files[keys[1]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || {str(missing_files[keys[13]]) if str(missing_files[keys[13]]) != "0" else "No Combat Level"} || {t}\n')
+                t = (str(missing_files[keys[18]]).replace("None, ","").replace(", None","").replace("[","").replace("]","").replace(single_q,""))
+                f.write(f'| [[{str(missing_files[keys[1]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || {str(missing_files[keys[20]]) if str(missing_files[keys[20]]) != "0" else "No Combat Level"} || {t}\n')
 
                 f.write("|-" + "\n")
         f.write("|-\n|}" + "\n")
