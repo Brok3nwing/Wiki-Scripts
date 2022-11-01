@@ -19,7 +19,7 @@ item_render_set = []
 cache_version = 0
 
 def read_data():
-    reader = pd.read_excel("C:/Users/Brok/Documents/Python/PycharmProjects/wiki_scripts/test.xlsx", usecols="A:F")
+    reader = pd.read_excel("C:/Users/Brok/Documents/Python/PycharmProjects/wiki_scripts/test2.xlsm", usecols="A:F")
     df = pd.DataFrame(reader)
     for i in range(len(df.id.dropna())):
         item_id.append(int(df.id[i]) + 512)
@@ -134,11 +134,11 @@ def render_single_items():
         render_female_equipped_name = f"{out}/female/player/{get_item_name_from_cache(id[i] - 512)}{name[i] if name[i] != '' else ''} equipped female.png"
 
         if not os.path.isfile(render_male_equipped_name):
-            print(get_item_name_from_cache(id[i] - 512), male_proc)
+            print("Rendering (male): ", get_item_name_from_cache(id[i] - 512))
             subprocess.call(male_proc)
             os.rename(pre_render_male_equipped_name, render_male_equipped_name)
         if not os.path.isfile(render_female_equipped_name):
-            print(get_item_name_from_cache(id[i] - 512), female_proc)
+            print("Rendering (female): ", get_item_name_from_cache(id[i] - 512))
             subprocess.call(female_proc)
             os.rename(pre_render_female_equipped_name, render_female_equipped_name)
 
