@@ -130,11 +130,12 @@ def render_single_items():
         pre_render_male_equipped_name = f"{out}/male/player/[{male_player_kit.replace(',', ', ')}]_[{male_player_colors.replace(',', ', ')}].png"
         pre_render_female_equipped_name = f"{out}/female/player/[{female_player_kit.replace(',', ', ')}]_[{female_player_colors.replace(',', ', ')}].png"
 
-        render_male_equipped_name = f"{out}/male/player/{get_item_name_from_cache(id[i] - 512)}{name[i] if name[i] != '' else ''} equipped male.png"
-        render_female_equipped_name = f"{out}/female/player/{get_item_name_from_cache(id[i] - 512)}{name[i] if name[i] != '' else ''} equipped female.png"
+        render_male_equipped_name = f"{out}/male/player/{get_item_name_from_cache(id[i] - 512)}{' equipped male.png' if name[i] == '' else ' '+name[i]+' equipped male.png'}"
+        render_female_equipped_name = f"{out}/female/player/{get_item_name_from_cache(id[i] - 512)}{' equipped female.png' if name[i] == '' else ' '+name[i]+' equipped female.png'}"
 
         if not os.path.isfile(render_male_equipped_name):
             print("Rendering (male): ", get_item_name_from_cache(id[i] - 512))
+            # print(male_proc)
             subprocess.call(male_proc)
             os.rename(pre_render_male_equipped_name, render_male_equipped_name)
         if not os.path.isfile(render_female_equipped_name):
