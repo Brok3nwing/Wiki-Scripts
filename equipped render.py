@@ -5,10 +5,10 @@ import json
 from itertools import cycle
 
 
-#  male default kit [0, 0, 0, 0, 363, 0, 342, 356, 259, 289, 298, 270]
+#  male default kit [0,0,0,0,363,0,342,356,259,289,298,270]
 #  female default kit [0, 0, 0, 0, 312, 0, 317, 326, 377, 324, 335, 0]
 # female default color [7, 16, 26, 0, 0]
-#  kit {head},{cape},{neck},{weapon},{chest},{shield},{arms},{legs},{hair},{hands},{feet},{jaw}
+#  kit {head},{cape},{neck},{weapon},{chest},{shield},{arms},{legs},{hair/head},{hands},{feet},{jaw}
 
 item_id = []
 item_name = []
@@ -78,9 +78,9 @@ def render_single_items():
         # 3 weapon
         # 4 top
         # 5 shield
-        # 6 ?
+        # 6 hair
         # 7 bottom
-        # 8 ?
+        # 8 arms
         # 9 gloves
         # 10 boots
         # 11 jaw
@@ -116,13 +116,13 @@ def render_single_items():
         if slot[0] == 0:
             head_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {male_player_kit} --playercolors {male_player_colors} --playerchathead --anim 589 --cache E:/Caches/{version[0]}/cache --out {out}"
             subprocess.call(head_proc)
-            # os.rename(f"{out}/playerchathead/[{male_player_kit.replace(',', ', ')}]_[{male_player_colors.replace(',', ', ')}].png",f"{out}/playerchathead/{get_item_name_from_cache(id[i] - 512)} chathead.png")
+            os.rename(f"{out}/playerchathead/[{male_player_kit.replace(',', ', ')}]_[{male_player_colors.replace(',', ', ')}].png",f"{out}/playerchathead/{get_item_name_from_cache(id[i] - 512)} chathead.png")
 
 
 
         male_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {male_player_kit} --playercolors {male_player_colors} --poseanim {808 if anim[i] == 0 else anim[i]} --yan2d {128 if rota[i] == 0 else rota[i]} --cache E:/Caches/{version[0]}/cache --out {out}/male"
         female_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {female_player_kit} --playercolors {female_player_colors} --playerfemale --anim {808 if anim[i] == 0 else anim[i]} --yan2d {128 if rota[i] == 0 else rota[i]} --cache E:/Caches/{version[0]}/cache --out {out}/female"
-
+        print(male_proc)
 
         # print(f"(female) {name[i]} : {female_player_kit}")
         # print(f"(male) {name[i]} : {male_player_kit}")
@@ -135,7 +135,7 @@ def render_single_items():
 
         if not os.path.isfile(render_male_equipped_name):
             print("Rendering (male): ", get_item_name_from_cache(id[i] - 512))
-            # print(male_proc)
+            print(male_proc)
             subprocess.call(male_proc)
             os.rename(pre_render_male_equipped_name, render_male_equipped_name)
         if not os.path.isfile(render_female_equipped_name):
@@ -144,79 +144,59 @@ def render_single_items():
             os.rename(pre_render_female_equipped_name, render_female_equipped_name)
 
 def render_sets():
+    out = "out99"
     male_player_colors = "0,3,15,1,0"
     female_player_colors = "7,16,26,0,0"
-    id, name, slot, anim, rota, armour_set, version = read_data()
-    sets = set()
-    full_set = {}
-    for x in range(len(armour_set)):
-        if armour_set[x] != "":
-            sets.add(armour_set[x])
+    #  male default kit [0, 0, 0, 0, 363, 0, 342, 356, 259, 289, 298, 270]
 
-    for x in range(len(sets)):
-        full_set = {
+    #  kit {head},{cape},{neck},{weapon},{chest},{shield},{arms},{legs},{hair},{hands},{feet},{jaw}
 
+    id, name, anim, rota, armour_set, version = read_data()
+    l = ()
 
-            list(sets)[x]:
-                {
-                    "head": 0,
-                    "cape": 0,
-                    "neck": 0,
-                    "weapon": 0,
-                    "chest": 312,
-                    "shield": 0,
-                    "arms": 317,
-                    "legs": 326,
-                    "hair": 0,
-                    "hands": 324,
-                    "feet": 335,
-                    "jaw": 0,
-                }
+    male_player_kit = {
+        0: 0, # helm
+        1: 0, # cape
+        2: 0, # amulet
+        3: 0, # weapon
+        4: 363, # top
+        5: 0, # shield
+        8: 356, # hair
+        6: 259, # arms
+        7: 342, # legs
+        9: 289, # gloves
+        10: 298, # boots
+        11: 270 # jaw
+    }
 
+    for c, i in enumerate(set(id)):
 
-            # list(sets)[x]:
-            #     {
-            #         "head": 0,
-            #         "cape": 0,
-            #         "neck": 0,
-            #         "weapon": 0,
-            #         "chest": 363,
-            #         "shield": 0,
-            #         "arms": 342,
-            #         "legs": 356,
-            #         "hair": 259,
-            #         "hands": 289,
-            #         "feet": 298,
-            #         "jaw": 270,
-            #     }
+        slot = get_item_data_from_cache(i - 512)
+        print(slot)
+        male_player_kit[slot[0]] = i
 
-
-        }
-        for y in range(len(armour_set)):
-            if armour_set[y] != "":
-                if armour_set[y] == list(sets)[x]:
-                    full_set[list(sets)[x]][slot[y]] = id[y]
-                    if slot[y] == "chest":
-                        full_set[list(sets)[x]]["arms"] = 0
-                    elif slot[y] == "head":
-                        full_set[list(sets)[x]]["hair"] = 0
-                        full_set[list(sets)[x]]["jaw"] = 0
-        male_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {convert_to_player_kit(full_set)} --playerfemale --playercolors {female_player_colors} --poseanim 808 --yan2d 128 --cache E:/Caches/{version[0]}/cache --out out99/female"
-        print(male_proc)
-        subprocess.call(male_proc)
-
-
-
+        if slot[0] == 0:
+            if slot[1] == 8:
+                male_player_kit[8] = 0
+            if slot[2] == 11:
+                male_player_kit[11] = 0
+        if slot[0] == 4:
+            if slot[1] == 6:
+                male_player_kit[6] = 0
+    print(male_player_kit)
+    male_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {convert_to_player_kit(male_player_kit)} --playercolors {male_player_colors} --poseanim {808 if anim[0] == 0 else anim[0]} --yan2d {128 if rota[0] == 0 else rota[0]} --cache E:/Caches/{version[0]}/cache --out {out}/male"
+    print(male_proc)
+    subprocess.call(male_proc)
 
 def convert_to_player_kit(kit: dict):
     player_kit = []
     final_kit = ","
-    for i in kit.keys():
-        for j, b in kit[i].items():
-            player_kit.append(str(b))
+
+    for keys, values in kit.items():
+        player_kit.append(str(values))
 
     return final_kit.join(player_kit)
 
 
-render_single_items()
-# render_sets()
+# render_single_items()
+render_sets()
