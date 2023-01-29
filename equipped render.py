@@ -115,14 +115,15 @@ def render_single_items():
 
         if slot[0] == 0:
             head_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {male_player_kit} --playercolors {male_player_colors} --playerchathead --anim 589 --cache E:/Caches/{version[0]}/cache --out {out}"
-            subprocess.call(head_proc)
-            os.rename(f"{out}/playerchathead/[{male_player_kit.replace(',', ', ')}]_[{male_player_colors.replace(',', ', ')}].png",f"{out}/playerchathead/{get_item_name_from_cache(id[i] - 512)} chathead.png")
+            if not os.path.isfile(f"{out}/playerchathead/{get_item_name_from_cache(id[i] - 512)} chathead.png"):
+                subprocess.call(head_proc)
+                os.rename(f"{out}/playerchathead/[{male_player_kit.replace(',', ', ')}]_[{male_player_colors.replace(',', ', ')}].png",f"{out}/playerchathead/{get_item_name_from_cache(id[i] - 512)} chathead.png")
 
 
 
         male_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {male_player_kit} --playercolors {male_player_colors} --poseanim {808 if anim[i] == 0 else anim[i]} --yan2d {128 if rota[i] == 0 else rota[i]} --cache E:/Caches/{version[0]}/cache --out {out}/male"
         female_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {female_player_kit} --playercolors {female_player_colors} --playerfemale --anim {808 if anim[i] == 0 else anim[i]} --yan2d {128 if rota[i] == 0 else rota[i]} --cache E:/Caches/{version[0]}/cache --out {out}/female"
-        print(male_proc)
+
 
         # print(f"(female) {name[i]} : {female_player_kit}")
         # print(f"(male) {name[i]} : {male_player_kit}")
@@ -134,14 +135,15 @@ def render_single_items():
         render_female_equipped_name = f"{out}/female/player/{get_item_name_from_cache(id[i] - 512)}{' equipped female.png' if name[i] == '' else ' '+name[i]+' equipped female.png'}"
 
         if not os.path.isfile(render_male_equipped_name):
-            print("Rendering (male): ", get_item_name_from_cache(id[i] - 512))
-            print(male_proc)
-            subprocess.call(male_proc)
-            os.rename(pre_render_male_equipped_name, render_male_equipped_name)
+            if read_data()[5][1] == "x":
+                print("Rendering (male): ", get_item_name_from_cache(id[i] - 512))
+                subprocess.call(male_proc)
+                os.rename(pre_render_male_equipped_name, render_male_equipped_name)
         if not os.path.isfile(render_female_equipped_name):
-            print("Rendering (female): ", get_item_name_from_cache(id[i] - 512))
-            subprocess.call(female_proc)
-            os.rename(pre_render_female_equipped_name, render_female_equipped_name)
+            if read_data()[5][2] == "x":
+                print("Rendering (female): ", get_item_name_from_cache(id[i] - 512))
+                subprocess.call(female_proc)
+                os.rename(pre_render_female_equipped_name, render_female_equipped_name)
 
 def render_sets():
     out = "out99"
@@ -169,10 +171,26 @@ def render_sets():
         11: 270 # jaw
     }
 
+    female_player_kit = {
+        0: 0, # helm
+        1: 0, # cape
+        2: 0, # amulet
+        3: 0, # weapon
+        4: 312, # top
+        5: 0, # shield
+        8: 377, # hair
+        6: 317, # arms
+        7: 326, # legs
+        9: 324, # gloves
+        10: 335, # boots
+        11: 0 # jaw always 0
+    }
+
+
+
     for c, i in enumerate(set(id)):
 
         slot = get_item_data_from_cache(i - 512)
-        print(slot)
         male_player_kit[slot[0]] = i
 
         if slot[0] == 0:
@@ -183,10 +201,40 @@ def render_sets():
         if slot[0] == 4:
             if slot[1] == 6:
                 male_player_kit[6] = 0
-    print(male_player_kit)
+
+    render_male_equipped_name = f"{out}/male/player/{armour_set[0]} equipped male.png"
+    pre_render_male_equipped_name = f"{out}/male/player/[{convert_to_player_kit(male_player_kit).replace(',', ', ')}]_[{male_player_colors.replace(',', ', ')}].png"
+
     male_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {convert_to_player_kit(male_player_kit)} --playercolors {male_player_colors} --poseanim {808 if anim[0] == 0 else anim[0]} --yan2d {128 if rota[0] == 0 else rota[0]} --cache E:/Caches/{version[0]}/cache --out {out}/male"
-    print(male_proc)
-    subprocess.call(male_proc)
+    if read_data()[5][1] == "x":
+        print({f"Male: {male_proc}"})
+        subprocess.call(male_proc)
+        os.rename(pre_render_male_equipped_name, render_male_equipped_name)
+
+
+
+
+    for c, i in enumerate(set(id)):
+        slot = get_item_data_from_cache(i - 512)
+        female_player_kit[slot[0]] = i
+
+        if slot[0] == 0:
+            if slot[1] == 8:
+                female_player_kit[8] = 0
+        if slot[0] == 4:
+            if slot[1] == 6:
+                female_player_kit[6] = 0
+
+    render_female_equipped_name = f"{out}/female/player/{armour_set[0]} equipped female.png"
+    pre_render_female_equipped_name = f"{out}/female/player/[{convert_to_player_kit(female_player_kit).replace(',', ', ')}]_[{female_player_colors.replace(',', ', ')}].png"
+
+    female_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {convert_to_player_kit(female_player_kit)} --playercolors {female_player_colors} --poseanim {808 if anim[0] == 0 else anim[0]} --yan2d {128 if rota[0] == 0 else rota[0]} --cache E:/Caches/{version[0]}/cache --out {out}/female"
+
+    if read_data()[5][2] == "x":
+        print({f"Female: {female_proc}"})
+        subprocess.call(female_proc)
+        os.rename(pre_render_female_equipped_name, render_female_equipped_name)
+
 
 def convert_to_player_kit(kit: dict):
     player_kit = []
@@ -198,5 +246,28 @@ def convert_to_player_kit(kit: dict):
     return final_kit.join(player_kit)
 
 
-# render_single_items()
-render_sets()
+def main():
+    id, name, anim, rota, armour_set, version = read_data()
+    if not armour_set[0] == "":
+        print("*** Rendering Sets ***")
+        if read_data()[5][1] == "x":
+            print("Rendering Males ♂")
+        if read_data()[5][2] == "x":
+            print("Rendering Females ♀")
+
+        print("\n")
+        render_sets()
+        # os.rename(pre_render_male_equipped_name, render_male_equipped_name)
+    else:
+        print("*** Rendering single items ***")
+        if read_data()[5][1] == "x":
+            print("Rendering Males ♂")
+        if read_data()[5][2] == "x":
+            print("Rendering Females ♀")
+
+        print("\n")
+        render_single_items()
+
+if __name__ == '__main__':
+    main()
+
