@@ -2,7 +2,6 @@ import subprocess
 import os
 import pandas as pd
 import json
-from itertools import cycle
 
 
 #  male default kit [0,0,0,0,363,0,342,356,259,289,298,270]
@@ -186,13 +185,13 @@ def render_sets():
         11: 0 # jaw always 0
     }
 
-
-
-    for c, i in enumerate(set(id)):
+    print("Rendering male Composition:")
+    for c, i in enumerate(set(id), 1):
 
         slot = get_item_data_from_cache(i - 512)
         male_player_kit[slot[0]] = i
-
+        n = get_item_name_from_cache(i - 512)
+        print(f"{c}: {n}")
         if slot[0] == 0:
             if slot[1] == 8:
                 male_player_kit[8] = 0
@@ -211,13 +210,12 @@ def render_sets():
         subprocess.call(male_proc)
         os.rename(pre_render_male_equipped_name, render_male_equipped_name)
 
-
-
-
-    for c, i in enumerate(set(id)):
+    print("Rendering female Composition:")
+    for c, i in enumerate(set(id), 1):
         slot = get_item_data_from_cache(i - 512)
+        n = get_item_name_from_cache(i - 512)
         female_player_kit[slot[0]] = i
-
+        print(f"{c}: {n}")
         if slot[0] == 0:
             if slot[1] == 8:
                 female_player_kit[8] = 0
@@ -228,10 +226,9 @@ def render_sets():
     render_female_equipped_name = f"{out}/female/player/{armour_set[0]} equipped female.png"
     pre_render_female_equipped_name = f"{out}/female/player/[{convert_to_player_kit(female_player_kit).replace(',', ', ')}]_[{female_player_colors.replace(',', ', ')}].png"
 
-    female_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {convert_to_player_kit(female_player_kit)} --playercolors {female_player_colors} --poseanim {808 if anim[0] == 0 else anim[0]} --yan2d {128 if rota[0] == 0 else rota[0]} --cache E:/Caches/{version[0]}/cache --out {out}/female"
+    female_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {convert_to_player_kit(female_player_kit)} --playercolors {female_player_colors} --playerfemale --poseanim {808 if anim[0] == 0 else anim[0]} --yan2d {128 if rota[0] == 0 else rota[0]} --cache E:/Caches/{version[0]}/cache --out {out}/female"
 
     if read_data()[5][2] == "x":
-        print({f"Female: {female_proc}"})
         subprocess.call(female_proc)
         os.rename(pre_render_female_equipped_name, render_female_equipped_name)
 
@@ -257,6 +254,7 @@ def main():
 
         print("\n")
         render_sets()
+        input("\n*** Finished ***")
         # os.rename(pre_render_male_equipped_name, render_male_equipped_name)
     else:
         print("*** Rendering single items ***")
