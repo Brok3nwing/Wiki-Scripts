@@ -148,7 +148,7 @@ def render_sets():
     out = "out99"
     male_player_colors = "0,3,15,1,0"
     female_player_colors = "7,16,26,0,0"
-    #  male default kit [0, 0, 0, 0, 363, 0, 342, 356, 259, 289, 298, 270]
+    #  male default kit [0,0,0,0,363,0,342,356,259,289,298,270]
 
     #  kit {head},{cape},{neck},{weapon},{chest},{shield},{arms},{legs},{hair},{hands},{feet},{jaw}
 
@@ -162,9 +162,9 @@ def render_sets():
         3: 0, # weapon
         4: 363, # top
         5: 0, # shield
+        7: 342,  # legs
         8: 356, # hair
-        6: 259, # arms
-        7: 342, # legs
+        6: 259,  # arms
         9: 289, # gloves
         10: 298, # boots
         11: 270 # jaw
@@ -185,50 +185,52 @@ def render_sets():
         11: 0 # jaw always 0
     }
 
-    print("Rendering male Composition:")
-    for c, i in enumerate(set(id), 1):
 
-        slot = get_item_data_from_cache(i - 512)
-        male_player_kit[slot[0]] = i
-        n = get_item_name_from_cache(i - 512)
-        print(f"{c}: {n}")
-        if slot[0] == 0:
-            if slot[1] == 8:
-                male_player_kit[8] = 0
-            if slot[2] == 11:
-                male_player_kit[11] = 0
-        if slot[0] == 4:
-            if slot[1] == 6:
-                male_player_kit[6] = 0
 
-    render_male_equipped_name = f"{out}/male/player/{armour_set[0]} equipped male.png"
-    pre_render_male_equipped_name = f"{out}/male/player/[{convert_to_player_kit(male_player_kit).replace(',', ', ')}]_[{male_player_colors.replace(',', ', ')}].png"
-
-    male_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {convert_to_player_kit(male_player_kit)} --playercolors {male_player_colors} --poseanim {808 if anim[0] == 0 else anim[0]} --yan2d {128 if rota[0] == 0 else rota[0]} --cache E:/Caches/{version[0]}/cache --out {out}/male"
     if read_data()[5][1] == "x":
-        print({f"Male: {male_proc}"})
+        print("Rendering male Composition:")
+        for c, i in enumerate(set(id), 1):
+
+            slot = get_item_data_from_cache(i - 512)
+            male_player_kit[slot[0]] = i
+            n = get_item_name_from_cache(i - 512)
+            print(f"{c}: {n}")
+            if slot[0] == 0:
+                if slot[1] == 8:
+                    male_player_kit[8] = 0
+                if slot[2] == 11:
+                    male_player_kit[11] = 0
+            if slot[0] == 4:
+                if slot[1] == 6:
+                    male_player_kit[8] = 0
+
+        render_male_equipped_name = f"{out}/male/player/{armour_set[0]} equipped male.png"
+        pre_render_male_equipped_name = f"{out}/male/player/[{convert_to_player_kit(male_player_kit).replace(',', ', ')}]_[{male_player_colors.replace(',', ', ')}].png"
+        male_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {convert_to_player_kit(male_player_kit)} --playercolors {male_player_colors} --poseanim {808 if anim[0] == 0 else anim[0]} --yan2d {128 if rota[0] == 0 else rota[0]} --cache E:/Caches/{version[0]}/cache --out {out}/male"
+        print(male_proc)
         subprocess.call(male_proc)
         os.rename(pre_render_male_equipped_name, render_male_equipped_name)
 
-    print("Rendering female Composition:")
-    for c, i in enumerate(set(id), 1):
-        slot = get_item_data_from_cache(i - 512)
-        n = get_item_name_from_cache(i - 512)
-        female_player_kit[slot[0]] = i
-        print(f"{c}: {n}")
-        if slot[0] == 0:
-            if slot[1] == 8:
-                female_player_kit[8] = 0
-        if slot[0] == 4:
-            if slot[1] == 6:
-                female_player_kit[6] = 0
-
-    render_female_equipped_name = f"{out}/female/player/{armour_set[0]} equipped female.png"
-    pre_render_female_equipped_name = f"{out}/female/player/[{convert_to_player_kit(female_player_kit).replace(',', ', ')}]_[{female_player_colors.replace(',', ', ')}].png"
-
-    female_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {convert_to_player_kit(female_player_kit)} --playercolors {female_player_colors} --playerfemale --poseanim {808 if anim[0] == 0 else anim[0]} --yan2d {128 if rota[0] == 0 else rota[0]} --cache E:/Caches/{version[0]}/cache --out {out}/female"
 
     if read_data()[5][2] == "x":
+
+        print("Rendering female Composition:")
+        for c, i in enumerate(set(id), 1):
+            slot = get_item_data_from_cache(i - 512)
+            n = get_item_name_from_cache(i - 512)
+            female_player_kit[slot[0]] = i
+            print(f"{c}: {n}")
+            if slot[0] == 0:
+                if slot[1] == 8:
+                    female_player_kit[8] = 0
+            if slot[0] == 4:
+                if slot[1] == 6:
+                    female_player_kit[6] = 0
+
+        render_female_equipped_name = f"{out}/female/player/{armour_set[0]} equipped female.png"
+        pre_render_female_equipped_name = f"{out}/female/player/[{convert_to_player_kit(female_player_kit).replace(',', ', ')}]_[{female_player_colors.replace(',', ', ')}].png"
+        female_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {convert_to_player_kit(female_player_kit)} --playercolors {female_player_colors} --playerfemale --poseanim {808 if anim[0] == 0 else anim[0]} --yan2d {128 if rota[0] == 0 else rota[0]} --cache E:/Caches/{version[0]}/cache --out {out}/female"
+        print(female_proc)
         subprocess.call(female_proc)
         os.rename(pre_render_female_equipped_name, render_female_equipped_name)
 
