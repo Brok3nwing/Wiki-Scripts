@@ -67,22 +67,6 @@ def render_single_items():
 
     for i in range(len(id)):
         slot = get_item_data_from_cache(id[i] - 512)
-        # print(get_item_name_from_cache(id[i]-512), slot)
-
-        # f"{str(id[i]) if slot[0] == 'hair' else 259}," \ ---377 for female----
-
-        # 0 helm
-        # 1 cape
-        # 2 amulet
-        # 3 weapon
-        # 4 top
-        # 5 shield
-        # 6 hair
-        # 7 bottom
-        # 8 arms
-        # 9 gloves
-        # 10 boots
-        # 11 jaw
 
 
         male_player_kit = f"{str(id[i]) if slot[0] == 0 else 0}," \
@@ -113,10 +97,10 @@ def render_single_items():
              f"0"
 
         if slot[0] == 0:
-            head_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {male_player_kit} --playercolors {male_player_colors} --playerchathead --anim 589 --cache E:/Caches/{version[0]}/cache --out {out}"
+            head_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {male_player_kit} --crophead --playercolors {male_player_colors} --playerchathead --anim 589 --cache E:/Caches/{version[0]}/cache --out {out}"
             if not os.path.isfile(f"{out}/playerchathead/{get_item_name_from_cache(id[i] - 512)} chathead.png"):
                 subprocess.call(head_proc)
-                os.rename(f"{out}/playerchathead/[{male_player_kit.replace(',', ', ')}]_[{male_player_colors.replace(',', ', ')}].png",f"{out}/playerchathead/{get_item_name_from_cache(id[i] - 512)} chathead.png")
+                os.rename(f"{out}/playerchathead/[{male_player_kit.replace(',', ', ')}]_[{male_player_colors.replace(',', ', ')}].png",f"{out}/playerchathead/{get_item_name_from_cache(id[i] - 512)}{' chathead.png' if name[i] == '' else ' '+name[i]+' chathead.png'}")
 
 
 
@@ -156,33 +140,33 @@ def render_sets():
     l = ()
 
     male_player_kit = {
-        0: 0, # helm
-        1: 0, # cape
-        2: 0, # amulet
-        3: 0, # weapon
-        4: 363, # top
-        5: 0, # shield
-        7: 342,  # legs
-        8: 356, # hair
-        6: 259,  # arms
-        9: 289, # gloves
-        10: 298, # boots
-        11: 270 # jaw
+        "0": 0, # helm
+        "1": 0, # cape
+        "2": 0, # amulet
+        "3": 0, # weapon
+        "4": 363, # top
+        "5": 0, # shield
+        "6": 342,  # arms
+        "7": 356, # legs
+        "8": 259,  # hair
+        "9": 289, # gloves
+        "10": 298, # boots
+        "11": 270 # jaw
     }
 
     female_player_kit = {
-        0: 0, # helm
-        1: 0, # cape
-        2: 0, # amulet
-        3: 0, # weapon
-        4: 312, # top
-        5: 0, # shield
-        8: 377, # hair
-        6: 317, # arms
-        7: 326, # legs
-        9: 324, # gloves
-        10: 335, # boots
-        11: 0 # jaw always 0
+        "0": 0, # helm
+        "1": 0, # cape
+        "2": 0, # amulet
+        "3": 0, # weapon
+        "4": 312, # top
+        "5": 0, # shield
+        "6": 317, # hair
+        "7": 326, # arms
+        "8": 377, # legs
+        "9": 324, # gloves
+        "10": 335, # boots
+        "11": 0 # jaw always 0
     }
 
 
@@ -192,22 +176,22 @@ def render_sets():
         for c, i in enumerate(set(id), 1):
 
             slot = get_item_data_from_cache(i - 512)
-            male_player_kit[slot[0]] = i
+            # male_player_kit[slot[0]] = i
+            male_player_kit.update({str(slot[0]): i})
             n = get_item_name_from_cache(i - 512)
             print(f"{c}: {n}")
             if slot[0] == 0:
                 if slot[1] == 8:
-                    male_player_kit[8] = 0
+                    male_player_kit.update({"8": 0})
                 if slot[2] == 11:
-                    male_player_kit[11] = 0
+                    male_player_kit.update({"11": 0})
             if slot[0] == 4:
                 if slot[1] == 6:
-                    male_player_kit[8] = 0
+                    male_player_kit.update({"6": 0})
 
         render_male_equipped_name = f"{out}/male/player/{armour_set[0]} equipped male.png"
         pre_render_male_equipped_name = f"{out}/male/player/[{convert_to_player_kit(male_player_kit).replace(',', ', ')}]_[{male_player_colors.replace(',', ', ')}].png"
         male_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {convert_to_player_kit(male_player_kit)} --playercolors {male_player_colors} --poseanim {808 if anim[0] == 0 else anim[0]} --yan2d {128 if rota[0] == 0 else rota[0]} --cache E:/Caches/{version[0]}/cache --out {out}/male"
-        print(male_proc)
         subprocess.call(male_proc)
         os.rename(pre_render_male_equipped_name, render_male_equipped_name)
 
@@ -218,19 +202,20 @@ def render_sets():
         for c, i in enumerate(set(id), 1):
             slot = get_item_data_from_cache(i - 512)
             n = get_item_name_from_cache(i - 512)
-            female_player_kit[slot[0]] = i
+            # female_player_kit[slot[0]] = i
+            female_player_kit.update({str(slot[0]): i})
             print(f"{c}: {n}")
             if slot[0] == 0:
                 if slot[1] == 8:
-                    female_player_kit[8] = 0
+                    female_player_kit.update({"8": 0})
             if slot[0] == 4:
                 if slot[1] == 6:
-                    female_player_kit[6] = 0
+                    female_player_kit.update({"6": 0})
 
         render_female_equipped_name = f"{out}/female/player/{armour_set[0]} equipped female.png"
         pre_render_female_equipped_name = f"{out}/female/player/[{convert_to_player_kit(female_player_kit).replace(',', ', ')}]_[{female_player_colors.replace(',', ', ')}].png"
         female_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {convert_to_player_kit(female_player_kit)} --playercolors {female_player_colors} --playerfemale --poseanim {808 if anim[0] == 0 else anim[0]} --yan2d {128 if rota[0] == 0 else rota[0]} --cache E:/Caches/{version[0]}/cache --out {out}/female"
-        print(female_proc)
+        # print(female_proc)
         subprocess.call(female_proc)
         os.rename(pre_render_female_equipped_name, render_female_equipped_name)
 
