@@ -100,13 +100,22 @@ def render_single_items():
             head_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {male_player_kit} --crophead --playercolors {male_player_colors} --playerchathead --anim 589 --cache E:/Caches/{version[0]}/cache --out {out}"
             if not os.path.isfile(f"{out}/playerchathead/{get_item_name_from_cache(id[i] - 512)} chathead.png"):
                 subprocess.call(head_proc)
-                os.rename(f"{out}/playerchathead/[{male_player_kit.replace(',', ', ')}]_[{male_player_colors.replace(',', ', ')}].png",f"{out}/playerchathead/{get_item_name_from_cache(id[i] - 512)}{' chathead.png' if name[i] == '' else ' '+name[i]+' chathead.png'}")
+                alt_name = name[i]
+                name_from_cache = get_item_name_from_cache(id[i] - 512)
+                alt_end_name = f"{out}/playerchathead/{name_from_cache} {alt_name} chathead.png"
+                end_name = f"{out}/playerchathead/{name_from_cache} chathead.png"
+                if os.path.exists(end_name) or os.path.exists(alt_end_name):
+                    print("E")
+                else:
+                    os.rename(f"{out}/playerchathead/[{male_player_kit.replace(',', ', ')}]_[{male_player_colors.replace(',', ', ')}].png",f"{out}/playerchathead/{get_item_name_from_cache(id[i] - 512)}{' chathead.png' if name[i] == '' else ' '+name[i]+' chathead.png'}")
 
 
+
+        # male_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {male_player_kit} --playercolors {male_player_colors} --poseanim {808 if anim[i] == 0 else anim[i]} --yan2d {128 if rota[i] == 0 else rota[i]} --cache E:/Caches/{version[0]}/cache --out {out}/male"
+        # female_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {female_player_kit} --playercolors {female_player_colors} --playerfemale --anim {808 if anim[i] == 0 else anim[i]} --yan2d {128 if rota[i] == 0 else rota[i]} --cache E:/Caches/{version[0]}/cache --out {out}/female"
 
         male_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {male_player_kit} --playercolors {male_player_colors} --poseanim {808 if anim[i] == 0 else anim[i]} --yan2d {128 if rota[i] == 0 else rota[i]} --cache E:/Caches/{version[0]}/cache --out {out}/male"
         female_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {female_player_kit} --playercolors {female_player_colors} --playerfemale --anim {808 if anim[i] == 0 else anim[i]} --yan2d {128 if rota[i] == 0 else rota[i]} --cache E:/Caches/{version[0]}/cache --out {out}/female"
-
 
         # print(f"(female) {name[i]} : {female_player_kit}")
         # print(f"(male) {name[i]} : {male_player_kit}")
@@ -114,8 +123,8 @@ def render_single_items():
         pre_render_male_equipped_name = f"{out}/male/player/[{male_player_kit.replace(',', ', ')}]_[{male_player_colors.replace(',', ', ')}].png"
         pre_render_female_equipped_name = f"{out}/female/player/[{female_player_kit.replace(',', ', ')}]_[{female_player_colors.replace(',', ', ')}].png"
 
-        render_male_equipped_name = f"{out}/male/player/{get_item_name_from_cache(id[i] - 512)}{' equipped male.png' if name[i] == '' else ' '+name[i]+' equipped male.png'}"
-        render_female_equipped_name = f"{out}/female/player/{get_item_name_from_cache(id[i] - 512)}{' equipped female.png' if name[i] == '' else ' '+name[i]+' equipped female.png'}"
+        render_male_equipped_name = f"{out}/male/player/{get_item_name_from_cache(id[i] - 512)}{' equipped male.png' if name[i] == '' else ' '+str(name)[i]+' equipped male.png'}"
+        render_female_equipped_name = f"{out}/female/player/{get_item_name_from_cache(id[i] - 512)}{' equipped female.png' if name[i] == '' else ' '+str(name)[i]+' equipped female.png'}"
 
         if not os.path.isfile(render_male_equipped_name):
             if read_data()[5][1] == "x":
