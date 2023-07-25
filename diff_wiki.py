@@ -10,7 +10,7 @@ deleted_string = "Deleted"
 old = input("Old Cache: ")
 new = input("New Cache: ")
 out = input("Output: ")
-
+# out = "Test"
 
 table_creation = '{| class="wikitable sortable"\n'
 
@@ -34,9 +34,9 @@ format_options_regex1 = "[\[\]']|None"
 format_options_regex2 = "[\[\]']|None"
 name_array = 0
 o = 0
-
-# old_dir = f"C:/AbexRenderer/Cache Definitions/{old}/"
-# new_dir = f"C:/AbexRenderer/Cache Definitions/{new}/"
+#
+# old_dir = f"E:/Caches/205.3/definitions/"
+# new_dir = f"E:/Caches/205.4/definitions/"
 
 old_dir = f"E:/Caches/{old}/definitions/"
 new_dir = f"E:/Caches/{new}/definitions/"
@@ -122,24 +122,25 @@ def get_same_key_count_items():
 def get_same_key_count_npcs():
     print("Calculating npc diffs")
     occ = []
-    count = 0
     dir1 = old_dir + "/npc_defs/"
     dir2 = new_dir + "/npc_defs/"
-    names1 = os.listdir(dir1)
-    names2 = os.listdir(dir2)
-    common_names = set(names1) & set(names2)
+    old_npcs = os.listdir(dir1)
+    new_npcs = os.listdir(dir2)
+    c = 0
+    common_names = set(old_npcs) & set(new_npcs)
+
     dt = possible_keys.Keys.npcs_data
     sorted_names = natsort.natsorted(common_names)
-    y = 0
     k = []
+    files_to_process = len(sorted_names) / 100
+    for count, filename in enumerate(sorted_names):
+        print(count, end="\r")
 
-    for filename in sorted_names:
-        count += 1
-        print(filename)
         ext = os.path.splitext(filename)
         if ext[1] == ".json":
             json1 = json.load(open(os.path.join(dir1, filename)))
             json2 = json.load(open(os.path.join(dir2, filename)))
+
             for change in dt:
                 try:
                     data1 = json1[change]
@@ -238,7 +239,8 @@ def items_wiki():
     loop_count = 0
     count = 0
     with open(f"equipped.txt", "w") as file:
-        file.write("ID\tName\tSlot\tAnim\tRotation\n")
+        file.write("ID\tName\n")
+
         with open(f"{out}.txt", "a") as f:
             comma_count = 0
             f.write(f"{toc}\n==Items==\n===New Items===\n{table_creation}!colspan='11'|New Items{table_creation_2_new_items}")
@@ -248,24 +250,13 @@ def items_wiki():
             for m in missing:
                 with open(dir2 + str(m)) as names:
                     missing_files = json.load(names)
-                    with open(f"{str(missing_files[keys[1]])}.txt", "w") as new_item_page:
-                        new_item_page.write(f"{{{{Infobox Item\n"
-                                            f"|name = {str(missing_files[keys[1]])}\n"
-                                            f"|image = [[File:{str(missing_files[keys[1]])}.png]]\n"
-                                            f"|release = [[17 October]] [[2022]]\n"
-                                            f"|update = \n"
-                                            f"|members = {'Yes' if str(missing_files[keys[12]]) == 'True' else 'No'}\n"
-                                            f"|quest = \n"
-                                            f"|tradeable = {'Yes' if str(missing_files[keys[9]]) == 'True' else 'No'}\n"
-                                            f"|placeholder = {'No' if str(missing_files[keys[38]]) == '-1' else 'Yes'}\n"
-                                            f"|equipable = {'Yes' if 'Wear' in str(missing_files[keys[19]]) or 'Wield' in str(missing_files[keys[19]]) else 'No'}\n"
-                                            f"|stackable = {'No' if str(missing_files[keys[10]]) == '0' else 'Yes'}\n"
-                                            f"|noteable = {'No' if str(missing_files[keys[32]]) == '-1' else 'Yes'}\n"
-                                            f"|options = {(str(missing_files[keys[19]])).replace('[', '').replace(']', '').replace('None,', '').replace(single_q, '').replace('Drop', '').replace(',Drop', '')}\n"
-                                            f"|destroy = ")
-                    if "Wear" in str(missing_files[keys[19]]) or "Wield" in str(missing_files[keys[19]]):
+
+
+
+                    if "Wear" in str(missing_files[keys[22]]) or "Wield" in str(missing_files[keys[22]]):
 
                         file.write(f"{str(missing_files[keys[0]])}\t{str(missing_files[keys[1]])}\n")
+                        print(f"Writing:   {str(missing_files[keys[0]])}\t{str(missing_files[keys[1]])}\n")
 
                     f.write(f'| [[{str(missing_files[keys[1]])}]] '  # Name
                             f'|| [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] '  # ID
@@ -275,13 +266,16 @@ def items_wiki():
                             f'|| {"No" if str(missing_files[keys[10]]) == "0" else "Yes"} '  # Stackable
                             f'|| {"No" if str(missing_files[keys[35]]) == "-1" else "Yes"} '  # Noteable
                             # f'|| {format_options(format_options_regex1, str(missing_files[keys[19]]))} '  # InterfaceOptions
-                            f'|| {(str(missing_files[keys[22]])).replace("[", "").replace("]", "").replace("None,", "").replace(single_q, "")} '  # InterfaceOptions
+                            f'|| {", ".join(filter(None, missing_files[keys[22]]))} '  # InterfaceOptions
                             f'|| {"No" if str(missing_files[keys[42]]) == "-1" else "Yes"} '  # Placeholder
                             f'|| {str(missing_files[keys[8]])}\n' # Cost
                             f'|| {str(missing_files[keys[38]])}\n' # Weight
                             )
                     f.write("|-" + "\n")
             f.write("|-\n|}" + "\n")
+
+
+
 
             # Removed Items
             print("Writing Removed Items")
@@ -381,6 +375,7 @@ def npcs_wiki():
     g = get_npc_count()
     dir1 = old_dir + "/npc_defs/"
     dir2 = new_dir + "/npc_defs/"
+    options = ","
 
     names1 = os.listdir(dir1)
     names2 = os.listdir(dir2)
@@ -405,9 +400,8 @@ def npcs_wiki():
         for m in missing:
             with open(dir2 + str(m)) as names:
                 missing_files = json.load(names)
-                t = (str(missing_files[keys[18]]).replace("None, ","").replace(", None","").replace("[","").replace("]","").replace(single_q,""))
-                f.write(f'| [[{str(missing_files[keys[1]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || {str(missing_files[keys[20]]) if str(missing_files[keys[20]]) != "0" else "No Combat Level"} || {t}\n')
-
+                data = missing_files[keys[18]]
+                f.write(f'| [[{str(missing_files[keys[1]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || {str(missing_files[keys[20]]) if str(missing_files[keys[20]]) != "0" else "No Combat Level"} || {", ".join(filter(None, data))}\n')
                 f.write("|-" + "\n")
         f.write("|-\n|}" + "\n")
         f.write(f"===Removed NPCs===\n{table_creation}!colspan='2'|Removed NPCs{table_creation_2_removed_npcs}")
@@ -539,8 +533,8 @@ def objects_wiki():
         for m in missing:
             with open(dir2 + str(m)) as names:
                 missing_files = json.load(names)
-                t = (str(missing_files[keys[15]]).replace("None, ", "").replace(", None", "").replace("[", "").replace("]", "").replace(single_q, ""))
-                f.write(f'| [[{str(missing_files[keys[3]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || {t}\n')
+                # t = (str(missing_files[keys[15]]).replace("None, ", "").replace(", None", "").replace("[", "").replace("]", "").replace(single_q, "").replace("None", "-"))
+                f.write(f'| [[{str(missing_files[keys[3]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || {", ".join(filter(None, missing_files[keys[15]]))}\n')
                 f.write("|-" + "\n")
         f.write("|-\n|}" + "\n")
 
