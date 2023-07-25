@@ -1,267 +1,640 @@
-import subprocess
-import os
-import pandas as pd
 import json
+import os
+import possible_keys
+import natsort
+import re
+import colorsys
 
 
-#  male default kit [0,0,0,0,363,0,342,356,259,289,298,270]
-#  female default kit [0, 0, 0, 0, 312, 0, 317, 326, 377, 324, 335, 0]
-# female default color [7, 16, 26, 0, 0]
-#  kit {head},{cape},{neck},{weapon},{chest},{shield},{arms},{legs},{hair/head},{hands},{feet},{jaw}
+deleted_string = "Deleted"
+old = input("Old Cache: ")
+new = input("New Cache: ")
+out = input("Output: ")
+# out = "Test"
 
-item_id = []
-item_name = []
-item_slot = []
-item_anim = []
-item_rota = []
-item_render_set = []
-cache_version = 0
-
-def read_data():
-    reader = pd.read_excel("C:/Users/Brok/Documents/Python/PycharmProjects/wiki_scripts/test2.xlsm", usecols="A:F")
-    df = pd.DataFrame(reader)
-    for i in range(len(df.id.dropna())):
-        item_id.append(int(df.id[i]) + 512)
-        item_name.append(df.fillna("").name[i])
-        # item_slot.append(df.slot[i])
-        item_anim.append(int(df.fillna(0).anim[i]))
-        item_rota.append(int(df.fillna(0).rotation[i]))
-        item_render_set.append(df.fillna("").render_set[i])
-
-    cache_version = df.cache_version
-    return item_id, item_name, item_anim, item_rota, item_render_set, cache_version
-
-def get_item_name_from_cache(item_id: int):
-    version = read_data()[5][0]
-    path_to_defs = f"E:/Caches/{version}/definitions/item_defs/"
-    name = ""
-
-    with open(f"{path_to_defs}{item_id}.json") as f:
-        json_data = json.load(f)
-        name = json_data["name"]
-
-    return name
-
-def get_item_data_from_cache(item_id: int):
-    version = read_data()[5][0]
-    path_to_defs = f"E:/Caches/{version}/definitions/item_defs/"
-
-    with open(f"{path_to_defs}{item_id}.json") as f:
-        json_data = json.load(f)
-        wearpos1 = json_data["wearPos1"]
-        wearpos2 = json_data["wearPos2"]
-        wearpos3 = json_data["wearPos3"]
+table_creation = '{| class="wikitable sortable"\n'
 
 
-    return wearpos1, wearpos2, wearpos3
+table_creation_2_diff_items = '\n|-\n! style=width:15em | Name !! ID !! Key !! Previous Value !! New Value\n|-\n'
+table_creation_2_diff_npcs = '\n|-\n! style=width:15em | Name !! ID !! Key !! Previous Value !! New Value\n|-\n'
+table_creation_2_diff_objects = '\n|-\n! style=width:15em | Name !! ID !! Key !! Previous Value !! New Value\n|-\n'
 
 
-def render_single_items():
-    out = "out99"
+table_creation_2_new_items = '\n|-\n! style=width:15em | Name !! ID !! Members !! Tradeable in GE !! Equipable !! Stackable !! Noteable !! Options !! Placeholder !! Cost !! Weight\n|-\n'
+table_creation_2_new_npcs = '\n|-\n! style=width:15em | Name !! ID !! Combat Level !! Options\n|-\n'
+table_creation_2_new_objects = '\n|-\n! style=width:15em | Name !! ID !! Options\n|-\n'
 
-    id, name, anim, rota, set, version = read_data()
+table_creation_2_removed_items = '\n|-\n! style=width:15em | Name !! ID\n|-\n'
+table_creation_2_removed_npcs = '\n|-\n! style=width:15em | Name !! ID\n|-\n'
+table_creation_2_removed_objects = '\n|-\n! style=width:15em | Name !! ID\n|-\n'
 
-    male_player_colors = "0,3,15,1,0"
-    female_player_colors = "7,16,26,0,0"
+single_q = "'"
 
+format_options_regex1 = "[\[\]']|None"
+format_options_regex2 = "[\[\]']|None"
+name_array = 0
+o = 0
+#
+# old_dir = f"E:/Caches/205.3/definitions/"
+# new_dir = f"E:/Caches/205.4/definitions/"
 
-    for i in range(len(id)):
-        slot = get_item_data_from_cache(id[i] - 512)
+old_dir = f"E:/Caches/{old}/definitions/"
+new_dir = f"E:/Caches/{new}/definitions/"
 
-
-        male_player_kit = f"{str(id[i]) if slot[0] == 0 else 0}," \
-             f"{str(id[i]) if slot[0] == 1 else 0}," \
-             f"{str(id[i]) if slot[0] == 2 else 0}," \
-             f"{str(id[i]) if slot[0] == 3 else 0}," \
-             f"{str(id[i]) if slot[0] == 4 else 363}," \
-             f"{str(id[i]) if slot[0] == 5 else 0}," \
-             f"{0 if slot[1] == 8 else 259}," \
-             f"{0 if slot[1] == 6 else 342}," \
-             f"{str(id[i]) if slot[0] == 7 else 356}," \
-             f"{0 if slot[2] == 9 and slot[0] == 3 else str(id[i]) if slot[0] == 9 else 289}," \
-             f"{str(id[i]) if slot[0] == 10 else 298}," \
-             f"{0 if slot[2] == 11 else 270}"
+occ = []
 
 
-        female_player_kit = f"{str(id[i]) if slot[0] == 0 else 0}," \
-             f"{str(id[i]) if slot[0] == 1 else 0}," \
-             f"{str(id[i]) if slot[0] == 2 else 0}," \
-             f"{str(id[i]) if slot[0] == 3 else 0}," \
-             f"{str(id[i]) if slot[0] == 4 else 312}," \
-             f"{str(id[i]) if slot[0] == 5 else 0}," \
-             f"{0 if slot[1] == 8 else 377}," \
-             f"{0 if slot[1] == 6 else 317}," \
-             f"{str(id[i]) if slot[0] == 7 else 326}," \
-             f"{0 if slot[2] == 9 and slot[0] == 3 else str(id[i]) if slot[0] == 9 else 324}," \
-             f"{str(id[i]) if slot[0] == 10 else 335}," \
-             f"0"
+def convert_jagex_color_to_hex(number):
+    def get_hue():
+        h = number / 1024
+        l = h * 5.625
+        if l < 0:
+            return int(360 + (l))
+        else:
+            return int(l)
 
-        if slot[0] == 0:
-            head_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {male_player_kit} --crophead --playercolors {male_player_colors} --playerchathead --anim 589 --cache E:/Caches/{version[0]}/cache --out {out}"
-            if not os.path.isfile(f"{out}/playerchathead/{get_item_name_from_cache(id[i] - 512)} chathead.png"):
-                subprocess.call(head_proc)
-                alt_name = name[i]
-                name_from_cache = get_item_name_from_cache(id[i] - 512)
-                alt_end_name = f"{out}/playerchathead/{name_from_cache} {alt_name} chathead.png"
-                end_name = f"{out}/playerchathead/{name_from_cache} chathead.png"
-                if os.path.exists(end_name) or os.path.exists(alt_end_name):
-                    print("E")
-                else:
-                    os.rename(f"{out}/playerchathead/[{male_player_kit.replace(',', ', ')}]_[{male_player_colors.replace(',', ', ')}].png",f"{out}/playerchathead/{get_item_name_from_cache(id[i] - 512)}{' chathead.png' if name[i] == '' else ' '+name[i]+' chathead.png'}")
+    def get_lightness():
+        h = number % 128
+        return int(h * 0.591)
 
 
+    def get_saturation():
+        h = number / 1024
+        l = h % 1
+        return int(round(l, 2) * 100)
 
-        # male_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {male_player_kit} --playercolors {male_player_colors} --poseanim {808 if anim[i] == 0 else anim[i]} --yan2d {128 if rota[i] == 0 else rota[i]} --cache E:/Caches/{version[0]}/cache --out {out}/male"
-        # female_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {female_player_kit} --playercolors {female_player_colors} --playerfemale --anim {808 if anim[i] == 0 else anim[i]} --yan2d {128 if rota[i] == 0 else rota[i]} --cache E:/Caches/{version[0]}/cache --out {out}/female"
+    def hsl_to_rgb():
+        frac = colorsys.hls_to_rgb(get_hue()/360, get_lightness()/100, get_saturation()/100)
+        return frac[0]*255, frac[1]*255, frac[2]*255
 
-        male_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {male_player_kit} --playercolors {male_player_colors} --poseanim {808 if anim[i] == 0 else anim[i]} --yan2d {128 if rota[i] == 0 else rota[i]} --cache E:/Caches/{version[0]}/cache --out {out}/male"
-        female_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {female_player_kit} --playercolors {female_player_colors} --playerfemale --anim {808 if anim[i] == 0 else anim[i]} --yan2d {128 if rota[i] == 0 else rota[i]} --cache E:/Caches/{version[0]}/cache --out {out}/female"
+    def rgb_to_hex():
+        t = (int(hsl_to_rgb()[0]), int(hsl_to_rgb()[1]), int(hsl_to_rgb()[2]))
+        hex_color = '%02x%02x%02x' % t
 
-        # print(f"(female) {name[i]} : {female_player_kit}")
-        # print(f"(male) {name[i]} : {male_player_kit}")
+        return hex_color
 
-        pre_render_male_equipped_name = f"{out}/male/player/[{male_player_kit.replace(',', ', ')}]_[{male_player_colors.replace(',', ', ')}].png"
-        pre_render_female_equipped_name = f"{out}/female/player/[{female_player_kit.replace(',', ', ')}]_[{female_player_colors.replace(',', ', ')}].png"
+    return rgb_to_hex()
 
-        render_male_equipped_name = f"{out}/male/player/{get_item_name_from_cache(id[i] - 512)}{' equipped male.png' if name[i] == '' else ' '+str(name)[i]+' equipped male.png'}"
-        render_female_equipped_name = f"{out}/female/player/{get_item_name_from_cache(id[i] - 512)}{' equipped female.png' if name[i] == '' else ' '+str(name)[i]+' equipped female.png'}"
-
-        if not os.path.isfile(render_male_equipped_name):
-            if read_data()[5][1] == "x":
-                print("Rendering (male): ", get_item_name_from_cache(id[i] - 512))
-                subprocess.call(male_proc)
-                os.rename(pre_render_male_equipped_name, render_male_equipped_name)
-        if not os.path.isfile(render_female_equipped_name):
-            if read_data()[5][2] == "x":
-                print("Rendering (female): ", get_item_name_from_cache(id[i] - 512))
-                subprocess.call(female_proc)
-                os.rename(pre_render_female_equipped_name, render_female_equipped_name)
-
-def render_sets():
-    out = "out99"
-    male_player_colors = "0,3,15,1,0"
-    female_player_colors = "7,16,26,0,0"
-    #  male default kit [0,0,0,0,363,0,342,356,259,289,298,270]
-
-    #  kit {head},{cape},{neck},{weapon},{chest},{shield},{arms},{legs},{hair},{hands},{feet},{jaw}
-
-    id, name, anim, rota, armour_set, version = read_data()
-    l = ()
-
-    male_player_kit = {
-        "0": 0, # helm
-        "1": 0, # cape
-        "2": 0, # amulet
-        "3": 0, # weapon
-        "4": 363, # top
-        "5": 0, # shield
-        "6": 342,  # arms
-        "7": 356, # legs
-        "8": 259,  # hair
-        "9": 289, # gloves
-        "10": 298, # boots
-        "11": 270 # jaw
-    }
-
-    female_player_kit = {
-        "0": 0, # helm
-        "1": 0, # cape
-        "2": 0, # amulet
-        "3": 0, # weapon
-        "4": 312, # top
-        "5": 0, # shield
-        "6": 317, # hair
-        "7": 326, # arms
-        "8": 377, # legs
-        "9": 324, # gloves
-        "10": 335, # boots
-        "11": 0 # jaw always 0
-    }
+def format_options(rgx_list, text):
+    new_text = text
+    for rgx_match in rgx_list:
+        new_text = re.sub(rgx_match, '', new_text)
+    return new_text
 
 
+def get_same_key_count_items():
+    print("Calculating item diffs")
+    count = 0
+    f = []
+    occ = []
+    dir1 = old_dir + "/item_defs/"
+    dir2 = new_dir + "/item_defs/"
+    names1 = os.listdir(dir1)
+    names2 = os.listdir(dir2)
+    common_names = set(names1) & set(names2)
+    dt = possible_keys.Keys.item_data
+    sorted_names = natsort.natsorted(common_names)
 
-    if read_data()[5][1] == "x":
-        print("Rendering male Composition:")
-        for c, i in enumerate(set(id), 1):
-
-            slot = get_item_data_from_cache(i - 512)
-            # male_player_kit[slot[0]] = i
-            male_player_kit.update({str(slot[0]): i})
-            n = get_item_name_from_cache(i - 512)
-            print(f"{c}: {n}")
-            if slot[0] == 0:
-                if slot[1] == 8:
-                    male_player_kit.update({"8": 0})
-                if slot[2] == 11:
-                    male_player_kit.update({"11": 0})
-            if slot[0] == 4:
-                if slot[1] == 6:
-                    male_player_kit.update({"6": 0})
-
-        render_male_equipped_name = f"{out}/male/player/{armour_set[0]} equipped male.png"
-        pre_render_male_equipped_name = f"{out}/male/player/[{convert_to_player_kit(male_player_kit).replace(',', ', ')}]_[{male_player_colors.replace(',', ', ')}].png"
-        male_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {convert_to_player_kit(male_player_kit)} --playercolors {male_player_colors} --poseanim {808 if anim[0] == 0 else anim[0]} --yan2d {128 if rota[0] == 0 else rota[0]} --cache E:/Caches/{version[0]}/cache --out {out}/male"
-        subprocess.call(male_proc)
-        os.rename(pre_render_male_equipped_name, render_male_equipped_name)
-
-
-    if read_data()[5][2] == "x":
-
-        print("Rendering female Composition:")
-        for c, i in enumerate(set(id), 1):
-            slot = get_item_data_from_cache(i - 512)
-            n = get_item_name_from_cache(i - 512)
-            # female_player_kit[slot[0]] = i
-            female_player_kit.update({str(slot[0]): i})
-            print(f"{c}: {n}")
-            if slot[0] == 0:
-                if slot[1] == 8:
-                    female_player_kit.update({"8": 0})
-            if slot[0] == 4:
-                if slot[1] == 6:
-                    female_player_kit.update({"6": 0})
-
-        render_female_equipped_name = f"{out}/female/player/{armour_set[0]} equipped female.png"
-        pre_render_female_equipped_name = f"{out}/female/player/[{convert_to_player_kit(female_player_kit).replace(',', ', ')}]_[{female_player_colors.replace(',', ', ')}].png"
-        female_proc = f"java -jar E:/Renderer/renderer-all.jar --playerkit {convert_to_player_kit(female_player_kit)} --playercolors {female_player_colors} --playerfemale --poseanim {808 if anim[0] == 0 else anim[0]} --yan2d {128 if rota[0] == 0 else rota[0]} --cache E:/Caches/{version[0]}/cache --out {out}/female"
-        # print(female_proc)
-        subprocess.call(female_proc)
-        os.rename(pre_render_female_equipped_name, render_female_equipped_name)
+    for filename in sorted_names:
+        count += 1
+        if count % 5000 == 0:
+            print(count)
+        ext = os.path.splitext(filename)
+        if ext[1] == ".json":
+            json1 = json.load(open(os.path.join(dir1, filename)))
+            json2 = json.load(open(os.path.join(dir2, filename)))
+            for change in dt:
+                try:
+                    data1 = json1[change]
+                    data2 = json2[change]
+                    if data1 != data2:
+                        occ.append(json2[dt[0]])
+                        res = []
+                        for i in occ:
+                            if i not in res:
+                                res.append(i)
+                        f = [occ.count(i) for i in res]
+                except KeyError:
+                    pass
+    return f
 
 
-def convert_to_player_kit(kit: dict):
-    player_kit = []
-    final_kit = ","
+def get_same_key_count_npcs():
+    print("Calculating npc diffs")
+    occ = []
+    dir1 = old_dir + "/npc_defs/"
+    dir2 = new_dir + "/npc_defs/"
+    old_npcs = os.listdir(dir1)
+    new_npcs = os.listdir(dir2)
+    c = 0
+    common_names = set(old_npcs) & set(new_npcs)
 
-    for keys, values in kit.items():
-        player_kit.append(str(values))
+    dt = possible_keys.Keys.npcs_data
+    sorted_names = natsort.natsorted(common_names)
+    k = []
+    files_to_process = len(sorted_names) / 100
+    for count, filename in enumerate(sorted_names):
+        print(count, end="\r")
 
-    return final_kit.join(player_kit)
+        ext = os.path.splitext(filename)
+        if ext[1] == ".json":
+            json1 = json.load(open(os.path.join(dir1, filename)))
+            json2 = json.load(open(os.path.join(dir2, filename)))
+
+            for change in dt:
+                try:
+                    data1 = json1[change]
+                    data2 = json2[change]
+                    if data1 != data2:
+                        occ.append(json2[dt[0]])
+                        res = []
+                        for i in occ:
+                            if i not in res:
+                                res.append(i)
+                        k = [occ.count(i) for i in res]
+                except KeyError:
+                    pass
+    return k
 
 
-def main():
-    id, name, anim, rota, armour_set, version = read_data()
-    if not armour_set[0] == "":
-        print("*** Rendering Sets ***")
-        if read_data()[5][1] == "x":
-            print("Rendering Males ♂")
-        if read_data()[5][2] == "x":
-            print("Rendering Females ♀")
+def get_same_key_count_objects():
+    print("Calculating object diffs")
+    occ = []
+    count = 0
+    f = []
+    dir1 = old_dir + "/object_defs/"
+    dir2 = new_dir + "/object_defs/"
+    names1 = os.listdir(dir1)
+    names2 = os.listdir(dir2)
+    common_names = set(names1) & set(names2)
+    dt = possible_keys.Keys.objects_data
+    sorted_names = natsort.natsorted(common_names)
+    y = 0
 
-        print("\n")
-        render_sets()
-        input("\n*** Finished ***")
-        # os.rename(pre_render_male_equipped_name, render_male_equipped_name)
-    else:
-        print("*** Rendering single items ***")
-        if read_data()[5][1] == "x":
-            print("Rendering Males ♂")
-        if read_data()[5][2] == "x":
-            print("Rendering Females ♀")
+    for filename in sorted_names:
+        count += 1
+        ext = os.path.splitext(filename)
+        if ext[1] == ".json":
+            json1 = json.load(open(os.path.join(dir1, filename)))
+            json2 = json.load(open(os.path.join(dir2, filename)))
+            for change in dt:
+                try:
+                    data1 = json1[change]
+                    data2 = json2[change]
+                    if data1 != data2:
+                        occ.append(json2[dt[0]])
+                        res = []
+                        for i in occ:
+                            if i not in res:
+                                res.append(i)
+                        f = [occ.count(i) for i in res]
+                except KeyError:
+                    pass
+    return f
 
-        print("\n")
-        render_single_items()
 
-if __name__ == '__main__':
-    main()
+def get_item_count():
+    t = []
+    y = 0
+    for x in get_same_key_count_items():
+        y += x
+        t.append(y)
+    return t
 
+
+def get_npc_count():
+    t = []
+    y = 0
+    for x in get_same_key_count_npcs():
+        y += x
+        t.append(y)
+    return t
+
+
+def get_object_count():
+    t = []
+    y = 0
+    for x in get_same_key_count_objects():
+        y += x
+        t.append(y)
+    return t
+
+
+def items_wiki():
+    g = get_item_count()
+    dir1 = old_dir + "/item_defs/"
+    dir2 = new_dir + "/item_defs/"
+    toc = "{{ToC}}"
+
+    names1 = os.listdir(dir1)
+    names2 = os.listdir(dir2)
+
+    base_moid_url = "https://chisel.weirdgloop.org/moid/item_id.html#"
+
+    common_names = set(names1) & set(names2)
+    keys = possible_keys.Keys.item_data
+    sorted_names = natsort.natsorted(common_names)
+    z = get_same_key_count_items()
+    c = 0
+    loop_count = 0
+    count = 0
+    with open(f"equipped.txt", "w") as file:
+        file.write("ID\tName\n")
+
+        with open(f"{out}.txt", "a") as f:
+            comma_count = 0
+            f.write(f"{toc}\n==Items==\n===New Items===\n{table_creation}!colspan='11'|New Items{table_creation_2_new_items}")
+            missing = [name for name in names2 if name not in names1]
+            deleted = [name for name in names1 if name not in names2]
+            print("Writing New Items")
+            for m in missing:
+                with open(dir2 + str(m)) as names:
+                    missing_files = json.load(names)
+
+
+
+                    if "Wear" in str(missing_files[keys[22]]) or "Wield" in str(missing_files[keys[22]]):
+
+                        file.write(f"{str(missing_files[keys[0]])}\t{str(missing_files[keys[1]])}\n")
+                        print(f"Writing:   {str(missing_files[keys[0]])}\t{str(missing_files[keys[1]])}\n")
+
+                    f.write(f'| [[{str(missing_files[keys[1]])}]] '  # Name
+                            f'|| [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] '  # ID
+                            f'|| {"Yes" if str(missing_files[keys[15]]) == "True" else "No"} '  # Members
+                            f'|| {"Yes" if str(missing_files[keys[9]]) == "True" else "No"} '  # Tradeable
+                            f'|| {"No" if str(missing_files[keys[23]]) == "-1" else "Yes"} '  # male equipped 1
+                            f'|| {"No" if str(missing_files[keys[10]]) == "0" else "Yes"} '  # Stackable
+                            f'|| {"No" if str(missing_files[keys[35]]) == "-1" else "Yes"} '  # Noteable
+                            # f'|| {format_options(format_options_regex1, str(missing_files[keys[19]]))} '  # InterfaceOptions
+                            f'|| {", ".join(filter(None, missing_files[keys[22]]))} '  # InterfaceOptions
+                            f'|| {"No" if str(missing_files[keys[42]]) == "-1" else "Yes"} '  # Placeholder
+                            f'|| {str(missing_files[keys[8]])}\n' # Cost
+                            f'|| {str(missing_files[keys[38]])}\n' # Weight
+                            )
+                    f.write("|-" + "\n")
+            f.write("|-\n|}" + "\n")
+
+
+
+
+            # Removed Items
+            print("Writing Removed Items")
+            f.write(f"===Removed Items===\n{table_creation}!colspan='2'|Removed Items{table_creation_2_removed_items}")
+            for m in deleted:
+                with open(dir1 + str(m)) as names:
+                    missing_files = json.load(names)
+                    f.write(f'| [[{str(missing_files[keys[1]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}]\n')
+                    f.write("|-" + "\n")
+            f.write("|-\n|}" + "\n")
+
+            print("Writing Diff Items")
+            f.write(f"===Diff Items===\n{table_creation}!colspan='5'|Diff Items{table_creation_2_diff_items}")
+            # Item Diffs
+            for filename in sorted_names:
+                ext = os.path.splitext(filename)
+                if ext[1] == ".json":
+                    json1 = json.load(open(os.path.join(dir1, filename)))
+                    json2 = json.load(open(os.path.join(dir2, filename)))
+                    for change in keys:
+                        try:
+                            data1 = json1[change]
+                            data2 = json2[change]
+                            if data1 != data2:
+                                changed_value1 = json1[change]
+                                changed_value2 = json2[change]
+                                # print(z)
+                                if (len(g)) != 0:
+                                    if loop_count > 0: c += 1
+                                    if c == g[0] or loop_count == 0:
+                                        f.write(f'|rowspan="{z[0]+1}"|[[{str(json2[keys[1]])}]]\n')
+                                        f.write(f'|rowspan="{z[0]+1}"|[{base_moid_url}{str(json2[keys[0]])} {str(json2[keys[0]])}]\n')
+                                        f.write("|-" + "\n")
+                                        if str(change) == "name":
+                                            f.write(f"|{str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
+                                        elif str(change) == "colorFind" or str(change) == "colorReplace":
+                                            comma_count = 0
+                                            f.write(f'| {str(change)} ||')
+                                            for i in changed_value1:
+                                                color = convert_jagex_color_to_hex(i)
+                                                f.write(f'<span style = "background-color: #{color};color:white">{i}</span>')
+                                                if len(list(changed_value1)) > 1:
+                                                    if comma_count < (len(list(changed_value1)) - 1):
+                                                        f.write(",")
+                                                        comma_count += 1
+                                            f.write("||")
+                                            comma_count = 0
+                                            for i in changed_value2:
+                                                color2 = convert_jagex_color_to_hex(i)
+                                                f.write(f'<span style = "background-color: #{color2};color:white">{i}</span>')
+                                                if len(list(changed_value2)) > 1:
+                                                    if comma_count < (len(list(changed_value2)) - 1):
+                                                        f.write(",")
+                                                        comma_count += 1
+                                            f.write("\n")
+
+                                        else:
+                                            f.write(f"|{str(change)} || {str(changed_value1)} || {str(changed_value2)}\n")
+                                        f.write("|-" + "\n")
+                                        z.pop(0)
+                                        if loop_count >= 1:g.pop(0)
+                                    else:
+                                        # print(f"|{str(change)} || {str(changed_value1)} || {str(changed_value2)}\n")
+                                        if str(change) == "name":
+                                            f.write(f"| {str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
+                                        elif str(change) == "colorFind" or str(change) == "colorReplace":
+                                            comma_count = 0
+                                            f.write(f'| {str(change)} ||')
+                                            for i in changed_value1:
+                                                color = convert_jagex_color_to_hex(i)
+                                                f.write(f'<span style = "background-color: #{color};color:white">{i}</span>')
+                                                if len(list(changed_value1)) > 1:
+                                                    if comma_count < (len(list(changed_value1)) - 1):
+                                                        f.write(",")
+                                                        comma_count += 1
+                                            f.write("||")
+                                            comma_count = 0
+                                            for i in changed_value2:
+                                                color2 = convert_jagex_color_to_hex(i)
+                                                f.write(f'<span style = "background-color: #{color2};color:white">{i}</span>')
+                                                if len(list(changed_value2)) > 1:
+                                                    if comma_count < (len(list(changed_value2)) - 1):
+                                                        f.write(",")
+                                                        comma_count += 1
+                                            f.write("\n")
+
+                                        else:
+                                            f.write(f"| {str(change)} || {str(changed_value1)} || {str(changed_value2)}\n")
+                                        f.write("|-" + "\n")
+                                    loop_count += 1
+                        except KeyError:
+                            pass
+            f.write("|}" + "\n\n")
+
+
+def npcs_wiki():
+    g = get_npc_count()
+    dir1 = old_dir + "/npc_defs/"
+    dir2 = new_dir + "/npc_defs/"
+    options = ","
+
+    names1 = os.listdir(dir1)
+    names2 = os.listdir(dir2)
+
+    base_moid_url = "https://chisel.weirdgloop.org/moid/npc_id.html#"
+
+    common_names = set(names1) & set(names2)
+    keys = possible_keys.Keys.npcs_data
+    sorted_names = natsort.natsorted(common_names)
+    z = get_same_key_count_npcs()
+    # c = get_count()[0]
+    c = 0
+    loop_count = 0
+    count = 0
+
+    with open(f"{out}.txt", "a") as f:
+        comma_count = 0
+        f.write(f"==Non-Player Characters==\n===New NPCs===\n{table_creation}!colspan='4'|New NPCs{table_creation_2_new_npcs}")
+        print("Writing New Npc")
+        missing = [name for name in names2 if name not in names1]
+        deleted = [name for name in names1 if name not in names2]
+        for m in missing:
+            with open(dir2 + str(m)) as names:
+                missing_files = json.load(names)
+                data = missing_files[keys[18]]
+                f.write(f'| [[{str(missing_files[keys[1]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || {str(missing_files[keys[20]]) if str(missing_files[keys[20]]) != "0" else "No Combat Level"} || {", ".join(filter(None, data))}\n')
+                f.write("|-" + "\n")
+        f.write("|-\n|}" + "\n")
+        f.write(f"===Removed NPCs===\n{table_creation}!colspan='2'|Removed NPCs{table_creation_2_removed_npcs}")
+        print("Writing removed NPcs")
+        for m in deleted:
+            with open(dir1 + str(m)) as names:
+                missing_files = json.load(names)
+
+                f.write(f'| [[{str(missing_files[keys[1]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}]\n')
+                f.write("|-" + "\n")
+        f.write("|-\n|}" + "\n")
+
+        print("Writing Npc diffs")
+        f.write(f"===Diff NPCs===\n{table_creation}!colspan='5'|Diff NPCs{table_creation_2_diff_npcs}")
+        for filename in sorted_names:
+            ext = os.path.splitext(filename)
+            if ext[1] == ".json":
+                json1 = json.load(open(os.path.join(dir1, filename)))
+                json2 = json.load(open(os.path.join(dir2, filename)))
+                for change in keys:
+                    try:
+                        data1 = json1[change]
+                        data2 = json2[change]
+                        # print("g: ", g)
+                        if data1 != data2:
+                            changed_value1 = json1[change]
+                            changed_value2 = json2[change]
+                            if (len(g)) != 0:
+                                if loop_count > 0: c += 1
+                                if c == g[0] or loop_count == 0:
+                                    f.write(f'|rowspan="{z[0]+1}"|[[{str(json2[keys[1]])}]]\n')
+                                    f.write(f'|rowspan="{z[0]+1}"|[{base_moid_url}{str(json2[keys[0]])} {str(json2[keys[0]])}]\n')
+                                    f.write("|-" + "\n")
+                                    if str(change) == "name":
+                                        f.write(
+                                            f"|{str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
+                                    elif str(change) == "recolorToFind" or str(change) == "recolorToReplace":
+                                        comma_count = 0
+                                        f.write(f'| {str(change)} ||')
+                                        for i in changed_value1:
+                                            color = convert_jagex_color_to_hex(i)
+                                            f.write(
+                                                f'<span style = "background-color: #{color};color:white">{i}</span>')
+                                            if len(list(changed_value1)) > 1:
+                                                print(f"Length of {list(changed_value1)} : {len(list(changed_value1))} and comma_count {comma_count}")
+                                                if comma_count < (len(list(changed_value1)) - 1):
+                                                    f.write(",")
+                                                    comma_count += 1
+                                        f.write("||")
+                                        comma_count = 0
+                                        for i in changed_value2:
+                                            color2 = convert_jagex_color_to_hex(i)
+                                            f.write(
+                                                f'<span style = "background-color: #{color2};color:white">{i}</span>')
+                                            if len(list(changed_value2)) > 1:
+                                                print(f"Length of {list(changed_value2)} : {len(list(changed_value2))} and comma_count {comma_count}")
+                                                if comma_count < (len(list(changed_value2)) - 1):
+                                                    print(f"+adding comma")
+                                                    f.write(",")
+                                                    comma_count += 1
+                                        f.write("\n")
+
+                                    else:
+                                        f.write(f"|{str(change)} || {str(changed_value1)} || {str(changed_value2)}\n")
+                                    f.write("|-" + "\n")
+                                    z.pop(0)
+                                    if loop_count >= 1: g.pop(0)
+                                else:
+                                    # print(f"|{str(change)} || {str(changed_value1)} || {str(changed_value2)}\n")
+                                    if str(change) == "name":
+                                        f.write(
+                                            f"| {str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
+                                    elif str(change) == "recolorToFind" or str(change) == "recolorToReplace":
+                                        comma_count = 0
+                                        f.write(f'| {str(change)} ||')
+                                        for i in changed_value1:
+                                            color = convert_jagex_color_to_hex(i)
+                                            f.write(
+                                                f'<span style = "background-color: #{color};color:white">{i}</span>')
+                                            if len(list(changed_value1)) > 1:
+                                                if comma_count < (len(list(changed_value1)) - 1):
+                                                    f.write(",")
+                                                    comma_count += 1
+                                        f.write("||")
+                                        comma_count = 0
+                                        for i in changed_value2:
+                                            color2 = convert_jagex_color_to_hex(i)
+                                            f.write(
+                                                f'<span style = "background-color: #{color2};color:white">{i}</span>')
+                                            if len(list(changed_value2)) > 1:
+                                                if comma_count < (len(list(changed_value2)) - 1):
+                                                    f.write(",")
+                                                    comma_count += 1
+                                        f.write("\n")
+
+                                    else:
+                                        f.write(f"| {str(change)} || {str(changed_value1)} || {str(changed_value2)}\n")
+                                    f.write("|-" + "\n")
+                                loop_count += 1
+                    except KeyError:
+                        pass
+        f.write("|}" + "\n\n")
+
+
+def objects_wiki():
+    g = get_object_count()
+    count = 0
+    dir1 = old_dir + "/object_defs/"
+    dir2 = new_dir + "/object_defs/"
+
+    base_moid_url = "https://chisel.weirdgloop.org/moid/object_id.html#"
+
+    names1 = os.listdir(dir1)
+    names2 = os.listdir(dir2)
+
+    common_names = set(names1) & set(names2)
+    keys = possible_keys.Keys.objects_data
+    sorted_names = natsort.natsorted(common_names)
+    z = get_same_key_count_objects()
+    # c = get_count()[0]
+    c = 0
+    loop_count = 0
+
+    with open(f"{out}.txt", "a") as f:
+        comma_count = 0
+        f.write(f"==Objects==\n===New Objects=== \n{table_creation}!colspan='3'|New Objects{table_creation_2_new_objects}")
+        missing = [name for name in names2 if name not in names1]
+        deleted = [name for name in names1 if name not in names2]
+        for m in missing:
+            with open(dir2 + str(m)) as names:
+                missing_files = json.load(names)
+                # t = (str(missing_files[keys[15]]).replace("None, ", "").replace(", None", "").replace("[", "").replace("]", "").replace(single_q, "").replace("None", "-"))
+                f.write(f'| [[{str(missing_files[keys[3]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}] || {", ".join(filter(None, missing_files[keys[15]]))}\n')
+                f.write("|-" + "\n")
+        f.write("|-\n|}" + "\n")
+
+        f.write(f"===Removed Objects===\n{table_creation}!colspan='2'|Removed Objects{table_creation_2_removed_objects}")
+        print("Writing removed Objects")
+        for m in deleted:
+            with open(dir1 + str(m)) as names:
+                missing_files = json.load(names)
+                f.write(f'| [[{str(missing_files[keys[3]])}]] || [{base_moid_url}{str(missing_files[keys[0]])} {str(missing_files[keys[0]])}]\n')
+                f.write("|-" + "\n")
+        f.write("|-\n|}" + "\n")
+
+        print("Writing Object diffs")
+        f.write(f"===Diff Objects===\n{table_creation}!colspan='5'|Diff Objects{table_creation_2_diff_objects}")
+        for filename in sorted_names:
+            ext = os.path.splitext(filename)
+            if ext[1] == ".json":
+                json1 = json.load(open(os.path.join(dir1, filename)))
+                json2 = json.load(open(os.path.join(dir2, filename)))
+                for change in keys:
+                    try:
+                        data1 = json1[change]
+                        data2 = json2[change]
+                        if data1 != data2:
+                            changed_value1 = json1[change]
+                            changed_value2 = json2[change]
+                            if (len(g)) != 0:
+                                if loop_count > 0: c += 1
+                                if c == g[0] or loop_count == 0:
+                                    f.write(f'|rowspan="{z[0]+1}"|[[{str(json2[keys[3]])}]]\n')
+                                    f.write(f'|rowspan="{z[0]+1}"|[{base_moid_url}{str(json2[keys[0]])} {str(json2[keys[0]])}]\n')
+                                    f.write("|-" + "\n")
+                                    if str(change) == "name":
+                                        f.write(
+                                            f"|{str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
+                                    elif str(change) == "recolorToFind" or str(change) == "recolorToReplace":
+                                        comma_count = 0
+                                        f.write(f'| {str(change)} ||')
+                                        for i in changed_value1:
+                                            color = convert_jagex_color_to_hex(i)
+                                            f.write(
+                                                f'<span style = "background-color: #{color};color:white">{i}</span>')
+                                            if len(list(changed_value1)) > 1:
+                                                if comma_count < (len(list(changed_value1)) - 1):
+                                                    f.write(",")
+                                                    comma_count += 1
+                                        f.write("||")
+                                        comma_count = 0
+                                        for i in changed_value2:
+                                            color2 = convert_jagex_color_to_hex(i)
+                                            f.write(
+                                                f'<span style = "background-color: #{color2};color:white">{i}</span>')
+                                            if len(list(changed_value2)) > 1:
+                                                if comma_count < (len(list(changed_value2)) - 1):
+                                                    f.write(",")
+                                                    comma_count += 1
+                                        f.write("\n")
+
+                                    else:
+                                        f.write(f"|{str(change)} || {str(changed_value1)} || {str(changed_value2)}\n")
+                                    f.write("|-" + "\n")
+                                    z.pop(0)
+                                    if loop_count >= 1: g.pop(0)
+                                else:
+                                    # print(f"|{str(change)} || {str(changed_value1)} || {str(changed_value2)}\n")
+                                    if str(change) == "name":
+                                        f.write(
+                                            f"| {str(change)} || [[{str(changed_value1)}]] || [[{str(changed_value2)}]]\n")
+                                    elif str(change) == "recolorToFind" or str(change) == "recolorToReplace":
+                                        comma_count = 0
+                                        f.write(f'| {str(change)} ||')
+                                        for i in changed_value1:
+                                            color = convert_jagex_color_to_hex(i)
+                                            f.write(
+                                                f'<span style = "background-color: #{color};color:white">{i}</span>')
+                                            if len(list(changed_value1)) > 1:
+                                                if comma_count < (len(list(changed_value1)) - 1):
+                                                    f.write(",")
+                                                    comma_count += 1
+                                        f.write("||")
+                                        comma_count = 0
+                                        for i in changed_value2:
+                                            color2 = convert_jagex_color_to_hex(i)
+                                            f.write(
+                                                f'<span style = "background-color: #{color2};color:white">{i}</span>')
+                                            if len(list(changed_value2)) > 1:
+                                                if comma_count < (len(list(changed_value2)) - 1):
+                                                    f.write(",")
+                                                    comma_count += 1
+                                        f.write("\n")
+
+                                    else:
+                                        f.write(f"| {str(change)} || {str(changed_value1)} || {str(changed_value2)}\n")
+                                    f.write("|-" + "\n")
+                                loop_count += 1
+                    except KeyError:
+                        pass
+        f.write("|}" + "\n\n")
+
+
+items_wiki()
+npcs_wiki()
+objects_wiki()
