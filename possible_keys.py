@@ -12,82 +12,90 @@ class Keys:
         "isTradeable",  # 9
         "stackable",  # 10
         "inventoryModel",  # 11
-        "members",  # 12
-        "zoom2d",  # 13
-        "xOffset2d",  # 14
-        "yOffset2d",  # 15
-        "ambient",  # 16
-        "contrast",  # 17
-        "options",  # 18
-        "interfaceOptions",  # 19
-        "maleModel0",  # 20
-        "maleModel1",  # 21
-        "maleModel2",  # 22
-        "maleOffset",  # 23
-        "maleHeadModel",  # 24
-        "maleHeadModel2",  # 25
-        "femaleModel0",  # 26
-        "femaleModel1",  # 27
-        "femaleModel2",  # 28
-        "femaleOffset",  # 29
-        "femaleHeadModel",  # 30
-        "femaleHeadModel2",  # 31
-        "notedID",  # 32
-        "notedTemplate",  # 33
-        "team",  # 34
-        "shiftClickDropIndex",  # 35
-        "boughtId",  # 36
-        "boughtTemplateId",  # 37
-        "placeholderId",  # 38
-        "placeholderTemplateId",  # 39
-        "colorFind",  # 40
-        "colorReplace",  # 41
-        "params",  # 42
-        "countCo",  # 43
-        "countObj",  # 44
-        "textureFind",  # 45
-        "textureReplace",  # 46
-        "category"  # 47
+        "wearPos1",  # 12
+        "wearPos2",  # 13
+        "wearPos3",  # 14
+        "members",  # 15
+        "zoom2d",  # 16
+        "xOffset2d",  # 17
+        "yOffset2d",  # 18
+        "ambient",  # 19
+        "contrast",  # 20
+        "options",  # 21
+        "interfaceOptions",  # 22
+        "maleModel0",  # 23
+        "maleModel1",  # 24
+        "maleModel2",  # 25
+        "maleOffset",  # 26
+        "maleHeadModel",  # 27
+        "maleHeadModel2",  # 28
+        "femaleModel0",  # 29
+        "femaleModel1",  # 30
+        "femaleModel2",  # 31
+        "femaleOffset",  # 32
+        "femaleHeadModel",  # 33
+        "femaleHeadModel2",  # 34
+        "notedID",  # 35
+        "notedTemplate",  # 36
+        "team",  # 37
+        "weight",  # 38
+        "shiftClickDropIndex",  # 39
+        "boughtId",  # 40
+        "boughtTemplateId",  # 41
+        "placeholderId",  # 42
+        "placeholderTemplateId",  # 43
+        "colorFind",  # 44
+        "colorReplace",  # 45
+        "params",  # 46
+        "countCo",  # 47
+        "countObj",  # 48
+        "textureFind",  # 49
+        "textureReplace",  # 50
+        "category"  # 51
     ]
 
     npcs_data = [
-        "id",
-        "name",
-        "size",
-        "chatheadModels/0",
-        "standingAnimation",
-        "rotateLeftAnimation",
-        "rotateRightAnimation",
-        "walkingAnimation",
-        "rotate180Animation",
-        "rotate90RightAnimation",
-        "rotate90LeftAnimation",
-        "actions",
-        "isMinimapVisible",
-        "combatLevel",
-        "widthScale",
-        "heightScale",
-        "hasRenderPriority",
-        "ambient",
-        "contrast",
-        "headIcon",
-        "rotationSpeed",
-        "varbitId",
-        "varpIndex",
-        "isInteractable",
-        "rotationFlag",
-        "isPet",
-        "recolorToFind",
-        "recolorToReplace",
-        "recolorToFind/5",
-        "recolorToReplace/5",
-        "configs",
-        "models",
-        "chatheadModels",
-        "retextureToFind",
-        "retextureToReplace",
-        "params"
-        "category"
+        "id", # 1
+        "name", # 2
+        "size", # 3
+        "models", # 4
+        "standingAnimation", # 5
+        "idleRotateLeftAnimation", # 6
+        "idleRotateRightAnimation", # 7
+        "walkingAnimation", # 8
+        "rotateLeftAnimation", # 9
+        "rotateRightAnimation", # 10
+        "runAnimation", # 11
+        "runRotate180Animation", # 12
+        "runRotateLeftAnimation", # 13
+        "runRotateRightAnimation", # 14
+        "crawlAnimation", # 15
+        "crawlRotate180Animation", # 16
+        "crawlRotateLeftAnimation", # 17
+        "crawlRotateRightAnimation", # 18
+        "actions", # 19
+        "isMinimapVisible", # 20
+        "combatLevel", # 21
+        "widthScale", # 22
+        "heightScale", # 23
+        "hasRenderPriority", # 24
+        "ambient", # 25
+        "contrast", # 26
+        "headIconSpriteIndex", # 27
+        "rotationSpeed", # 28
+        "varbitId", # 29
+        "headIconArchiveIds", # 30
+        "varpIndex", # 31
+        "isInteractable", # 32
+        "rotationFlag", # 33
+        "isPet", # 34
+        "category", # 35
+        "recolorToFind", # 36
+        "recolorToReplace", # 37
+        "retextureToFind", # 38
+        "retextureToReplace", # 39
+        "chatheadModels"
+
     ]
 
 
@@ -124,7 +132,11 @@ class Keys:
         "configChangeDest",
         "isRotated",
         "varpID",
+        "ambientSoundDistance",
+        "ambientSoundChangeTicksMin",
+        "ambientSoundChangeTicksMax",
         "ambientSoundId",
+        "ambientSoundIds",
         "aBool2111",
         "anInt2112",
         "anInt2113",
